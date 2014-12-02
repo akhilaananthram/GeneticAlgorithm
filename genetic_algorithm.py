@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import random
+import argparse
 
 class Polygon(object):
     def __init__(self, xbound, ybound):
@@ -28,6 +29,15 @@ class Polygon(object):
         y = int(random.random() * self.ybound)
         self.points.append([x,y])
 
+    def order_vertices(self):
+        #TO DO: order points
+        seed = self.points[0]
+        points = self.points[1:]
+
+        self.points = []
+
+        #sort
+
     def remove_vertex(self):
         to_remove = int(random.random() * len(self.points))
         self.points.pop(to_remove)
@@ -35,92 +45,153 @@ class Polygon(object):
     def change_opacity(self):
         self.opacity = random.random()
 
-    def change_color(self):
+    def change_red(self):
         self.red =   int(random.random() * 256)
+
+    def change_green(self):
         self.green = int(random.random() * 256)
+
+    def change_blue(self):
         self.blue =  int(random.random() * 256)
 
     def mutate(self):
         mutation = int(random.random() * 100)
         if(mutation < 5):
-            change_opacity()
+            self.change_opacity()
+        elif(mutation < 10):
+            self.change_red()
         elif(mutation < 15):
-            change_color()
+            self.change_green()
+        elif(mutation < 20):
+            self.change_blue()
         elif(mutation < 40):
             if(len(self.points)> 3):
                 if(int(random.random * 2) == 0):
-                    add_vertex()
+                    self.add_vertex()
                 else:
-                    remove_vertex()
+                    self.remove_vertex()
             else:
-                add_vertex()
+                self.add_vertex()
+
+class Fitness(object):
+    def __init__(self, original, type="euc"):
+        self.original = original
+        self.w = original.shape[1]
+        self.h = original.shape[0]
+
+        self.detector = cv2.ORB()
+        self.kp, self.desc = self.detector.detectAndCompute(self.original, None)
+        self.type = type
+
+    def euclidean(self, img):
+        '''assumes img and self.original have the same size'''
+        distance = 0.0
+        for i in xrange(self.w):
+            for j in xrange(self.h):
+                distance += np.linalg.norm(img[j][i] - self.original[j][i])
+
+        distance = distance / (self.w * self.h)
+        return distance
+
+    def feature_matching(self, img):
+        kp, desc = self.detector.detectAndCompute(img, None)
+
+        matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+        matches = matcher.match(self.desc, desc)
+
+        distance = 0.0
+
+        for m in matches:
+            distance += m.distance
+
+        distance = distance / len(matches)
+        return distance
+    
+    def score(self, img):
+        if (self.type == "euc"):
+            return self.euclidean(img)
+        elif (self.type == "feat"):
+            return self.feature_matching(img)
 
 class Driver(object):
-    def __init__(self, img):
+    def __init__(self, img, iterations=None):
         self.original = img
+        self.fit = Fitness(self.original)
+        self.iterations = iterations
+        self.w = self.original.shape[1]
+        self.h = self.original.shape[0]
 
-    def draw_on_image(self, polygon, img):
-        poly = np.array(polygon.points, np.int32)
-        w, h, _ = img.shape
-        mask = np.zeros((w, h))
-        cv2.fillPoly(mask, [poly], 1)
+    def draw(self, polygons):
+        img = np.zeros(self.original.shape)
+        
+        for p in polygons:
+            poly = np.array(p.points, np.int32)
+            h, w, _ = img.shape
+            mask = np.zeros((h,w))
+            cv2.fillPoly(mask, [poly], 1)
 
-        #opacity
-        for i in xrange(w):
-            for j in xrange(h):
-                #polygon exists there
-                if mask[i][j]:
-                    b0, g0, r0 = img[i][j]
-                    r1 = (1.0 - polygon.opacity) * r0 + polygon.opacity * polygon.red
-                    g1 = (1.0 - polygon.opacity) * g0 + polygon.opacity * polygon.green
-                    b1 = (1.0 - polygon.opacity) * b0 + polygon.opacity * polygon.blue
-                    img[i][j] = [b1, g1, r1]
+            #opacity
+            for i in xrange(w):
+                for j in xrange(h):
+                    #polygon exists there
+                    if mask[i][j]:
+                        b0, g0, r0 = img[i][j]
+                        r1 = (1.0 - p.opacity) * r0 + p.opacity * p.red
+                        g1 = (1.0 - p.opacity) * g0 + p.opacity * p.green
+                        b1 = (1.0 - p.opacity) * b0 + p.opacity * p.blue
+                        img[i][j] = [b1, g1, r1]
 
         return img
 
-    #resets canvas
-    def clear_image(self, img):
-        pass
-
-    #takes a list of polysgons
-    #draws them all to the same image
-    #computers the numeric fitness
-    #clears the image
-    #returns the fitness score
     def fitness(self, plys):
-        return 1
-        #for p in plys:
-        #    draw_on_image(p, img)
-
-        #blank_image()
+        return self.fit.score(self.draw(plys))
 
     def mutate(self, plys):
-        if(int(random.random*3) ==0):
+        val = int(random.random * 3)
+        if(val == 0):
             to_mutate = int(random.random() * len(plys))
             plys[to_mutate].mutate()
-        elif(int(random.random*3) ==1):
-            plys.append(Polygon())#add bounds 
+        elif(val == 1):
+            plys.append(Polygon(self.w, self.h))#add bounds 
         else:
             to_remove = int(random.random() * len(plys))
             plys.pop(to_remove)
 
     def cross_breed(self, polygons):
+        #TO DO: copy objects
         newpolygons = polygons
-        mutate(newpolygons)
-        while(fitness(newpolygons) <= fitness(polygons)):
+        self.mutate(newpolygons)
+
+        while(self.fitness(newpolygons) >= self.fitness(polygons)):
             newpolygons = polygons
-            mutate(newpolygons)
+            self.mutate(newpolygons)
         return newpolygons
 
     def run(self):
-        polygons = [Polygon()] #add bounds
+        polygons = [Polygon(self.w, self.h)] #add bounds
+        iterations = 0
         while True:
-            if(fitness(polygons) > .9):
+            if self.iterations != None and self.iterations == iterations:
                 return polygons
-            polygons = cross_breed(polygons)
 
+            if(self.fitness(polygons) > .9):
+                return polygons
+            polygons = self.cross_breed(polygons)
+            iterations += 1
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Test Genetic Algorithms")
+    parser.add_argument("--path", dest="path", type=str, help="Path to image. REQUIRED", required=True)
 
+    args = parser.parse_args()
+    return args
 
-d = Driver(img) #make this the mona lisa
-d.draw_on_image(d.run(), img) #set image
+if __name__=="__main__":
+    args = parse_args()
+
+    img = cv2.imread(args.path)
+    d = Driver(img)
+
+    polygons = d.run()
+    result = d.draw(polygons)
