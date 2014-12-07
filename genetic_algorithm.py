@@ -202,3 +202,4 @@ if __name__=="__main__":
 
     polygons = d.run()
     result = d.draw(polygons)
+    cv2.imwrite("result.jpg", result)
