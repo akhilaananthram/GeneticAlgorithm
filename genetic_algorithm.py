@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import random
 import argparse
+import copy
 
 class Polygon(object):
     def __init__(self, xbound, ybound):
@@ -118,7 +119,7 @@ class Fitness(object):
 class Driver(object):
     def __init__(self, img, iterations=None):
         self.original = img
-        self.fit = Fitness(self.original)
+        self.fit = Fitness(self.original, "feat")
         self.iterations = iterations
         self.w = self.original.shape[1]
         self.h = self.original.shape[0]
@@ -150,7 +151,7 @@ class Driver(object):
         return self.fit.score(self.draw(plys))
 
     def mutate(self, plys):
-        val = int(random.random * 2)
+        val = int(random.random() * 2)
         if(val == 0):
             to_mutate = int(random.random() * len(plys))
             plys[to_mutate].mutate()
@@ -162,12 +163,13 @@ class Driver(object):
 
     def cross_breed(self, polygons):
         #TO DO: copy objects
-        newpolygons = polygons
+        newpolygons = copy.deepcopy(polygons)
         self.mutate(newpolygons)
 
-        while(self.fitness(newpolygons) >= self.fitness(polygons)):
+        while(self.fitness(newpolygons) <= self.fitness(polygons)):
             newpolygons = polygons
             self.mutate(newpolygons)
+            print "fitness loop"
         return newpolygons
 
     def run(self):
@@ -179,8 +181,11 @@ class Driver(object):
 
             if(self.fitness(polygons) < 1):
                 return polygons
+            print iterations
             polygons = self.cross_breed(polygons)
+            print "leave crossbreed"
             iterations += 1
+            #print iterations
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Test Genetic Algorithms")
