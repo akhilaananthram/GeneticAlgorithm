@@ -136,12 +136,12 @@ class Driver(object):
             for i in xrange(w):
                 for j in xrange(h):
                     #polygon exists there
-                    if mask[i][j]:
-                        b0, g0, r0 = img[i][j]
+                    if mask[j][i]:
+                        b0, g0, r0 = img[j][i]
                         r1 = (1.0 - p.opacity) * r0 + p.opacity * p.red
                         g1 = (1.0 - p.opacity) * g0 + p.opacity * p.green
                         b1 = (1.0 - p.opacity) * b0 + p.opacity * p.blue
-                        img[i][j] = [b1, g1, r1]
+                        img[j][i] = [b1, g1, r1]
 
         return img
 
