@@ -170,7 +170,7 @@ class Driver(object):
         while(self.fitness(newpolygons) >= fit):
             newpolygons = copy.deepcopy(polygons)
             self.mutate(newpolygons)
-            print "fitness loop"
+            print "fitness loop: " + str(fit)
         return newpolygons
 
     def run(self):
