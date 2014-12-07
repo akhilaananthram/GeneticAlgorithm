@@ -56,14 +56,15 @@ class Polygon(object):
 
     def mutate(self):
         mutation = int(random.random() * 100)
-        if(mutation < 5):
+        if(mutation < 25):
             self.change_opacity()
-        elif(mutation < 10):
+        elif(mutation < 50):
             self.change_red()
-        elif(mutation < 15):
+        elif(mutation < 75):
             self.change_green()
-        elif(mutation < 20):
+        else:
             self.change_blue()
+            """
         elif(mutation < 40):
             if(len(self.points)> 3):
                 if(int(random.random * 2) == 0):
@@ -71,7 +72,7 @@ class Polygon(object):
                 else:
                     self.remove_vertex()
             else:
-                self.add_vertex()
+                self.add_vertex()"""
 
 class Fitness(object):
     def __init__(self, original, type="euc"):
@@ -148,15 +149,15 @@ class Driver(object):
         return self.fit.score(self.draw(plys))
 
     def mutate(self, plys):
-        val = int(random.random * 3)
+        val = int(random.random * 2)
         if(val == 0):
             to_mutate = int(random.random() * len(plys))
             plys[to_mutate].mutate()
-        elif(val == 1):
-            plys.append(Polygon(self.w, self.h))#add bounds 
         else:
+            plys.append(Polygon(self.w, self.h))#add bounds 
+        """else:
             to_remove = int(random.random() * len(plys))
-            plys.pop(to_remove)
+            plys.pop(to_remove)"""
 
     def cross_breed(self, polygons):
         #TO DO: copy objects
@@ -175,7 +176,7 @@ class Driver(object):
             if self.iterations != None and self.iterations == iterations:
                 return polygons
 
-            if(self.fitness(polygons) > .9):
+            if(self.fitness(polygons) < 1):
                 return polygons
             polygons = self.cross_breed(polygons)
             iterations += 1
