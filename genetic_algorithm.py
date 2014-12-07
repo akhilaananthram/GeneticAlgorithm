@@ -119,7 +119,7 @@ class Fitness(object):
 class Driver(object):
     def __init__(self, img, iterations=None):
         self.original = img
-        self.fit = Fitness(self.original, "feat")
+        self.fit = Fitness(self.original)
         self.iterations = iterations
         self.w = self.original.shape[1]
         self.h = self.original.shape[0]
@@ -202,3 +202,4 @@ if __name__=="__main__":
 
     polygons = d.run()
     result = d.draw(polygons)
+    cv2.imwrite("result.jpg", result)
