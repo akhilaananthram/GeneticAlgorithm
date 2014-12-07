@@ -143,6 +143,7 @@ class Driver(object):
                         b1 = (1.0 - p.opacity) * b0 + p.opacity * p.blue
                         img[j][i] = [b1, g1, r1]
 
+        cv2.imwrite("temp.png", img)
         return img
 
     def fitness(self, plys):
