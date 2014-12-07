@@ -142,7 +142,7 @@ class Driver(object):
                         r1 = (1.0 - p.opacity) * r0 + p.opacity * p.red
                         g1 = (1.0 - p.opacity) * g0 + p.opacity * p.green
                         b1 = (1.0 - p.opacity) * b0 + p.opacity * p.blue
-                        img[j][i] = [b1, g1, r1]
+                        img[j][i] = [r1, g1, b1]
 
         cv2.imwrite("temp.png", img)
         return img
@@ -152,7 +152,7 @@ class Driver(object):
 
     def mutate(self, plys):
         val = int(random.random() * 100)
-        if(val < 50):
+        if(val < 30):
             to_mutate = int(random.random() * len(plys))
             plys[to_mutate].mutate()
         else:
@@ -165,8 +165,9 @@ class Driver(object):
         #TO DO: copy objects
         newpolygons = copy.deepcopy(polygons)
         self.mutate(newpolygons)
+        fit = self.fitness(polygons)
 
-        while(self.fitness(newpolygons) <= self.fitness(polygons)):
+        while(self.fitness(newpolygons) >= fit):
             newpolygons = copy.deepcopy(polygons)
             self.mutate(newpolygons)
             print "fitness loop"
@@ -181,7 +182,6 @@ class Driver(object):
 
             if(self.fitness(polygons) < 1):
                 return polygons
-            print iterations
             polygons = self.cross_breed(polygons)
             print "leave crossbreed"
             iterations += 1
