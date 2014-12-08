@@ -1,8 +1,11 @@
 import cv2
+from multiprocessing import Pool
 import numpy as np
 import random
 import argparse
 import copy
+import math
+import time
 
 class Polygon(object):
     def __init__(self, xbound, ybound):
@@ -75,6 +78,18 @@ class Polygon(object):
             else:
                 self.add_vertex()"""
 
+def euclidean_helper(args):
+    img, original, wstart, wend = args
+    '''assumes img and self.original have the same size'''
+    #set up
+    distance = 0.0
+
+    for i in xrange(wstart, wend):
+        for j in xrange(original.shape[0]):
+            distance += np.linalg.norm(img[j][i] - original[j][i])
+
+    return distance
+
 class Fitness(object):
     def __init__(self, original, type="euc"):
         self.original = original
@@ -84,15 +99,23 @@ class Fitness(object):
         self.detector = cv2.ORB()
         self.kp, self.desc = self.detector.detectAndCompute(self.original, None)
         self.type = type
+        self.num_proc = 3
+        self.pool = Pool(self.num_proc)
+        self.wstarts = [int((self.w / self.num_proc) * i) for i in xrange(self.num_proc)]
+        self.wends = [int((self.w / self.num_proc) * (i + 1)) for i in xrange(self.num_proc)]
 
     def euclidean(self, img):
         '''assumes img and self.original have the same size'''
         distance = 0.0
-        for i in xrange(self.w):
-            for j in xrange(self.h):
-                distance += np.linalg.norm(img[j][i] - self.original[j][i])
+
+        #pass to pool
+        results = self.pool.map(euclidean_helper, [(img, self.original, self.wstarts[i], self.wends[i]) for i in xrange(self.num_proc)])
+
+        for r in results:
+          distance += r
 
         distance = distance / (self.w * self.h)
+
         return distance
 
     def feature_matching(self, img):
