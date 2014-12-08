@@ -34,7 +34,7 @@ class Polygon(object):
         self.points.append([x,y])
 
     def order_vertices(self):
-        #TO DO: order points
+        #TODO: order points
         seed = self.points[0]
         points = self.points[1:]
 
@@ -185,7 +185,6 @@ class Driver(object):
             plys.pop(to_remove)"""
 
     def cross_breed(self, polygons):
-        #TO DO: copy objects
         newpolygons = copy.deepcopy(polygons)
         self.mutate(newpolygons)
         fit = self.fitness(polygons)
