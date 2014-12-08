@@ -34,13 +34,18 @@ class Polygon(object):
         self.points.append([x,y])
 
     def order_vertices(self):
-        #TODO: order points
-        seed = self.points[0]
-        points = self.points[1:]
+        #calculate center point
+        xc = 0
+        yc = 0
+        for x, y in self.points:
+            xc += x
+            yc += y
 
-        self.points = []
+        xc = xc / len(self.points)
+        yc = yc / len(self.points)
 
         #sort
+        self.points = sorted(self.points, key=lambda p: math.atan2(p[1] - yc, p[0] - xc))
 
     def remove_vertex(self):
         to_remove = int(random.random() * len(self.points))
