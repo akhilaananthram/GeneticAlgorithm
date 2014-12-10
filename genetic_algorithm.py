@@ -20,6 +20,7 @@ class Polygon(object):
         x = int(random.random() * xbound)
         y = int(random.random() * ybound)
         self.points.append([x,y])
+        self.order_vertices()
 
         self.xbound = xbound
         self.ybound = ybound
@@ -32,6 +33,7 @@ class Polygon(object):
         x = int(random.random() * self.xbound)
         y = int(random.random() * self.ybound)
         self.points.append([x,y])
+        self.order_vertices()
 
     def order_vertices(self):
         #calculate center point
