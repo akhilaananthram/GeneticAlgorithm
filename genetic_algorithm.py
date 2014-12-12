@@ -72,13 +72,13 @@ class Polygon(object):
         self.opacity = random.random()
 
     def change_red(self):
-        self.red =   int(random.random() * 256)
+        self.red = int(random.random() * 256)
 
     def change_green(self):
         self.green = int(random.random() * 256)
 
     def change_blue(self):
-        self.blue =  int(random.random() * 256)
+        self.blue = int(random.random() * 256)
 
     def mutate(self):
         mutation = int(random.random() * 150)
@@ -187,10 +187,10 @@ class Fitness(object):
             return self.feature_matching(img)
 
 class Driver(object):
-    def __init__(self, img, args, iterations=None):
-        self.original = img
+    def __init__(self, args):
+        self.original = cv2.imread(args.path)
         self.fit = Fitness(self.original, args.fitness)
-        self.iterations = iterations
+        self.iterations = args.iterations
         self.w = self.original.shape[1]
         self.h = self.original.shape[0]
 
@@ -235,8 +235,8 @@ class Driver(object):
         return None
 
 class HillSteppingDriver(Driver):
-    def __init__(self, img, args, iterations=None):
-        Driver.__init(self, img, args, iterations)
+    def __init__(self, args):
+        Driver.__init__(self, args)
 
     def step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
@@ -245,7 +245,6 @@ class HillSteppingDriver(Driver):
         while(self.fitness(newpolygons) >= fit):
             newpolygons = copy.deepcopy(polygons)
             self.mutate(newpolygons)
-            #print "fitness loop: " + str(fit)
         return newpolygons
 
     def run(self):
@@ -264,21 +263,23 @@ class HillSteppingDriver(Driver):
             print iterations
 
 class GeneticAlgorithmDriver(Driver):
-    def __init__(self, img, args, iterations=None, num_parents=5, num_children=5):
-        Driver.__init(self, img, args, iterations)
-        self.num_parents = num_parents
-        self.num_children = num_children
+    def __init__(self, args):
+        Driver.__init__(self, args)
+        self.num_parents = args.num_parents
+        self.num_children = args.num_child
 
     def cross_breed(self, parents, probabilities):
         children = []
 
-        for i in xrange(len(self.num_children)):
+        for i in xrange(self.num_children):
             #select the parent with a certain probability
             r = random.random()
             p = 0
             while r > probabilities[p]:
                 p += 1
             parent = parents[p]
+
+            #mutate
             child = copy.deepcopy(parent)
             self.mutate(child)
             children.append(child)
@@ -306,15 +307,23 @@ class GeneticAlgorithmDriver(Driver):
                 probabilities[i] += probabilities[i - 1]
 
             parents = self.cross_breed(parents, probabilities)
-            #print "leave crossbreed"
+            #print "leave crossbreed""
             iterations += 1
             print iterations
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Test Genetic Algorithms")
+    parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "genetic"],
+        help="Type of algorithm to use", default="genetic")
+    parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"],
+        help="Type of fitness function to use.")
+
     parser.add_argument("--path", dest="path", type=str, help="Path to image. REQUIRED", required=True)
-    parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"])
     parser.add_argument("--dest", dest="dest", type=str, help="Path for destination image", default = None)
+
+    parser.add_argument("--iterations", dest="iterations", type=int, default=None, help="Number of iterations to do.")
+    parser.add_argument("--num_parents", dest="num_parents", type=int, default=5, help="Number of parents to have.")
+    parser.add_argument("--num_child", dest="num_child", type=int, default=5, help="Number of children to have.")
 
     args = parser.parse_args()
     return args
@@ -322,8 +331,10 @@ def parse_args():
 if __name__=="__main__":
     args = parse_args()
 
-    img = cv2.imread(args.path)
-    d = Driver(img, args)
+    if args.algo == "genetic":
+        d = GeneticAlgorithmDriver(args)
+    else:
+        d = HillSteppingDriver(args)
 
     polygons = d.run()
 
