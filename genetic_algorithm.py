@@ -217,9 +217,6 @@ class Driver(object):
         cv2.imwrite("temp.png", img)
         return img
 
-    def fitness(self, plys):
-        return self.fit.score(self.draw(plys))
-
     def mutate(self, plys):
         val = int(random.random() * 100)
         if(val < 30):
@@ -231,7 +228,17 @@ class Driver(object):
             to_remove = int(random.random() * len(plys))
             plys.pop(to_remove)"""
 
-    def cross_breed(self, polygons, fit):
+    def fitness(self, plys):
+        return self.fit.score(self.draw(plys))
+
+    def run(self):
+        return None
+
+class HillSteppingDriver(Driver):
+    def __init__(self, img, args, iterations=None):
+        Driver.__init(self, img, args, iterations)
+
+    def step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
         self.mutate(newpolygons)
 
@@ -251,7 +258,54 @@ class Driver(object):
             fit = self.fitness(polygons)
             if(fit < 1):
                 return polygons
-            polygons = self.cross_breed(polygons, fit)
+            polygons = self.step(polygons, fit)
+            #print "leave step"
+            iterations += 1
+            print iterations
+
+class GeneticAlgorithmDriver(Driver):
+    def __init__(self, img, args, iterations=None, num_parents=5, num_children=5):
+        Driver.__init(self, img, args, iterations)
+        self.num_parents = num_parents
+        self.num_children = num_children
+
+    def cross_breed(self, parents, probabilities):
+        children = []
+
+        for i in xrange(len(self.num_children)):
+            #select the parent with a certain probability
+            r = random.random()
+            p = 0
+            while r > probabilities[p]:
+                p += 1
+            parent = parents[p]
+            child = copy.deepcopy(parent)
+            self.mutate(child)
+            children.append(child)
+
+        return children
+
+    def run(self):
+        #generate parents
+        parents = [[Polygon(self.w, self.h)] for i in xrange(self.num_parents)]
+        iterations = 0
+        while True:
+            if self.iterations != None and self.iterations == iterations:
+                return polygons
+
+            fit = [self.fitness(p) for p in parents]
+            if (min(fit) < 1):
+                index = np.argmin(np.array(fit))
+                return parents[index]
+
+            total = 0
+            for i in fit:
+                total += i
+            probabilities = [(1.0 - i / total) for i in fit]
+            for i in xrange(1, len(probabilities)):
+                probabilities[i] += probabilities[i - 1]
+
+            parents = self.cross_breed(parents, probabilities)
             #print "leave crossbreed"
             iterations += 1
             print iterations
