@@ -8,8 +8,86 @@ import math
 import time
 import sys
 
+class Thresholds(object):
+    def __init__(self, threshold_file, pop_size):
+        #default initiation
+        #POLYGON MUTATION
+        self.opacity = .2
+        self.red = .2
+        self.green = .2
+        self.blue = .2
+        self.points = .2
+        self.remove_point = .5
+        #POPULATION MUTATION
+        self.pop_mutate_poly = .4
+        self.modify_list = .6
+        self.remove = 0.05
+        #EVOLVE
+        self.niche = 0
+        self.mutation = .3
+        self.elitism = None
+        self.add_random = 0
+
+        if threshold_file is not None:
+            #use json to read in dictionary
+            thresholds = json.load(threshold_file)
+
+            #POLYGON MUTATION
+            polygon = thresholds.get("polygon", {})
+            self.opacity = polygon.get("opacity", self.opacity)
+            self.red = polygon.get("red", self.red)
+            self.green = polygon.get("green", self.green)
+            self.blue = polygon.get("blue", self.blue)
+            self.points = polygon.get("points", self.points)
+            self.remove_point = polygon.get("remove_point", self.remove_point)
+
+            #POPULATION MUTATION
+            population = thresholds.get("population", {})
+            self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
+            self.modify_list = population.get("modify", self.modify_list)
+            remove = population.get("remove", self.remove)
+            if 0 <= remove <= 1:
+                self.remove = remove
+
+            #EVOLVE
+            evolve = thresholds.get("evolve", {})
+
+            self.niche = abs(evolve.get("niche", self.niche))
+            mutation = evolve.get("mutate", self.mutation)
+            if 0 <= mutation <= 1:
+                self.mutation = mutation
+            
+            self.add_random = evolve.get("add_random", self.add_random)
+
+            elitism = evolve.get("elitism", self.elitism)
+            #not valid elitism
+            if elitism <= 0 or elitism is None or elitism > pop_size:
+                self.elitism = None
+            #already proportion
+            elif elitism < 1:
+                self.elitism = elitism
+            #make into proportion
+            else:
+                self.elitism = elitism / pop_size
+
+        total = self.opacity + self.red + self.green + self.blue + self.points + self.remove_point
+        self.opacity = self.opacity / total
+        self.red = self.red / total
+        self.green = self.green / total
+        self.blue = self.blue / total
+        self.points = self.points / total
+        self.remove_point = self.remove_point / total
+
+        total = self.pop_mutate_poly + self.modify_list
+        self.pop_mutate_poly = self.pop_mutate_poly / total
+        self.modify_list = self.modify_list / total
+
+        self.polygon = [self.opacity, self.red, self.green, self.blue, self.remove_point]
+        for i in xrange(1, len(self.polygon)):
+            self.polygon[i] += self.polygon[i - 1]
+
 class Polygon(object):
-    def __init__(self, xbound, ybound, points=None, red = None, blue = None, green = None, opacity = None):
+    def __init__(self, xbound, ybound, t, points=None, red = None, blue = None, green = None, opacity = None):
         self.points = points
         if points is None:
             self.points = []
@@ -43,6 +121,8 @@ class Polygon(object):
         self.opacity = opacity
         if opacity is None:
             self.opacity = random.random()
+
+        self.t = t
 
     def add_vertex(self):
         x = int(random.random() * self.xbound)
@@ -81,21 +161,21 @@ class Polygon(object):
         self.blue = int(random.random() * 256)
 
     def mutate(self):
-        mutation = int(random.random() * 150)
-        if(mutation < 25):
+        mutation = random.random()
+        if(mutation < self.t.polygon[0]):
             self.change_opacity()
-        elif(mutation < 50):
+        elif(mutation < self.t.polygon[1]):
             self.change_red()
-        elif(mutation < 75):
+        elif(mutation < self.t.polygon[2]):
             self.change_green()
-        elif (mutation < 90):
+        elif (mutation < self.t.polygon[3]):
             self.change_blue()
         else:
             if(len(self.points)> 3):
-                if(int(random.random() * 2) == 0):
-                    self.add_vertex()
-                else:
+                if(random.random() < self.t.remove_point):
                     self.remove_vertex()
+                else:
+                    self.add_vertex()
             else:
                 self.add_vertex()
 
@@ -186,79 +266,6 @@ class Fitness(object):
         elif (self.type == "feat"):
             return self.feature_matching(img)
 
-class Thresholds(object):
-    def __init__(self, threshold_file, pop_size):
-        #default initiation
-        #POLYGON MUTATION
-        self.opacity = .2
-        self.red = .2
-        self.green = .2
-        self.blue = .2
-        self.points = .2
-        self.remove_point = .5
-        #POPULATION MUTATION
-        self.pop_add = .3
-        self.pop_remove = .3
-        self.pop_mutate_poly = .4
-        #EVOLVE
-        self.mutation = .3
-        self.cross_breed = .7
-        self.elitism = None
-        self.add_random = 0.005
-
-        if threshold_file is not None:
-            #use json to read in dictionary
-            thresholds = json.load(threshold_file)
-
-            #POLYGON MUTATION
-            polygon = thresholds.get("polygon", {})
-            self.opacity = polygon.get("opacity", self.opacity)
-            self.red = polygon.get("red", self.red)
-            self.green = polygon.get("green", self.green)
-            self.blue = polygon.get("blue", self.blue)
-            self.points = polygon.get("points", self.points)
-            self.remove_point = polygon.get("remove_point", self.remove_point)
-
-            total = self.opacity + self.red + self.green + self.blue + self.points + self.remove_point
-            self.opacity = self.opacity / total
-            self.red = self.red / total
-            self.green = self.green / total
-            self.blue = self.blue / total
-            self.points = self.points / total
-            self.remove_point = self.remove_point / total
-
-            #POPULATION MUTATION
-            population = thresholds.get("population", {})
-            self.pop_add = population.get("add", self.pop_add)
-            self.pop_remove = population.get("remove", self.pop_remove)
-            self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
-
-            total = self.pop_add + self.pop_remove + self.pop_mutate_poly
-            self.pop_add = self.pop_add / total
-            self.pop_remove = self.pop_remove / total
-            self.pop_mutate_poly = self.pop_mutate_poly / total
-
-            #EVOLVE
-            evolve = thresholds.get("evolve", {})
-            self.mutation = evolve.get("mutate", self.mutation)
-            self.cross_breed = evolve.get("cross_breed", self.cross_breed)
-            
-            total = self.mutation + self.cross_breed
-            self.mutation = self.mutation / total
-            self.cross_breed = self.cross_breed / total
-            
-            self.add_random = evolve.get("add_random", self.add_random)
-            elitism = evolve.get("elitism", self.elitism)
-            #not valid elitism
-            if elitism <= 0 or elitism is None or elitism > pop_size:
-                self.elitism = None
-            #already proportion
-            elif elitism < 1:
-                self.elitism = elitism
-            #make into proportion
-            else:
-                self.elitism = elitism / pop_size
-
 class Driver(object):
     def __init__(self, args, t):
         self.original = cv2.imread(args.path)
@@ -294,26 +301,36 @@ class Driver(object):
         return img
 
     def mutate(self, plys):
-        val = int(random.random() * 100)
-        if(val < 30):
-            to_mutate = int(random.random() * len(plys))
+        val = random.random()
+        if(val < self.t.pop_mutate_poly and len(plys) != 0):
+            to_mutate = random.randrange(0, len(plys))
             plys[to_mutate].mutate()
         else:
-            plys.append(Polygon(self.w, self.h))
-            if len(plys) > self.max_poly:
-                self.max_poly = len(ply)
-        """else:
-            to_remove = int(random.random() * len(plys))
-            plys.pop(to_remove)"""
+            if len(plys) > 0:
+                if (random.random() < self.t.remove):
+                    to_remove = int(random.random() * len(plys))
+                    plys.pop(to_remove)
+                else:
+                    plys.append(Polygon(self.w, self.h, self.t))
+                    if len(plys) > self.max_poly:
+                        self.max_poly = len(plys)
+            else:
+                plys.append(Polygon(self.w, self.h, self.t))
+                if len(plys) > self.max_poly:
+                    self.max_poly = len(plys)
     
     def random_person(self):
         person = []
         num_polys = random.randrange(1,self.max_poly + 1)
         for i in xrange(num_polys):
-            poly = Polygon(self.w, self.h)
+            poly = Polygon(self.w, self.h, self.t)
             num_points = random.randrange(3, 7)
             for j in xrange(3, num_points):
                 poly.add_vertex()
+
+            person.append(poly)
+
+        return person
 
     def fitness(self, plys):
         return self.fit.score(self.draw(plys))
@@ -359,64 +376,73 @@ class GeneticAlgorithmDriver(Driver):
         else:
             self.num_parents = 2
 
-    def cross_breed(parents):
+        self.niche_penalty = abs(args.niche)
+
+    def cross_breed(self, parents):
         num_from_parent = 0
         for p in parents:
             num_from_parent += len(p)
 
         #average length / num_parents
-        num_from_parent = size / (2 * len(parents))
+        num_from_parent = num_from_parent / len(parents)
 
         child = []
         for p in parents:
-            child = child + p[:num_from_parent]
+            child = child + copy.deepcopy(p[:num_from_parent])
+
+        random.shuffle(child)
+
         return child
 
     def evolve(self, population, pop_fitness):
         children = []
-        #TODO: NICHE PENALTY
+        #niche penalty
+        if self.niche_penalty != 0:
+            temp = pop_fitness
+            for i in xrange(len(pop_fitness)):
+                for j in xrange(i + 1, len(pop_fitness)):
+                    if abs(temp[i] - temp[j]) < self.t.niche:
+                        pop_fitness[i] = max(0, temp[i] - self.niche_penalty)
+                        pop_fitness[j] = max(0, temp[i] - self.niche_penalty)
+
+        total = 0
+        for i in pop_fitness:
+            total += i
 
         thresholds = [(1.0 - i / total) for i in pop_fitness]
         for i in xrange(1, len(thresholds)):
             thresholds[i] += thresholds[i - 1]
 
         for i in xrange(self.pop_size):
-            if random.random() < .5:
-                #cross breed
-                parents = []
-                parent_indices = set()
-                for i in xrange(self.num_parents):
-                    parent = None
-                    while parent == None:
-                        r = random.random()
-                        p = 0
-                        while r > thresholds[p]:
-                            p += 1
-                        if p not in parent_indices:
-                            parent = thresholds[p]
+            #cross breed
+            parents = []
+            parent_indices = set()
+            for i in xrange(self.num_parents):
+                parent = None
+                while parent == None:
+                    r = random.random()
+                    p = 0
+                    while r > thresholds[p]:
+                        p += 1
+                    if p not in parent_indices:
+                        parent = p
+                parent_indices.add(parent)
 
-                for i in parent_indices:
-                    parents.append(population[i])
+            for i in parent_indices:
+                parents.append(population[i])
 
-                child = self.cross_breed(parents)
-            else:
-                #mutate
-                r = random.random()
-                p = 0
-                while r > thresholds[p]:
-                    p += 1
+            child = self.cross_breed(parents)
 
-                parent = population[p]
-                child = copy.deepcopy(parent)
+            if random.random() < self.t.mutation:
                 self.mutate(child)
 
             children.append(child)
 
-        if self.elitism is not None:
+        if self.t.elitism is not None:
             #get (self.elitism * self.pop_size) best parents
             population, probabilities = zip(*sorted(zip(population, pop_fitness), key=lambda p:p[1], reverse=True))
 
-            num_parents = int(self.elitism * self.pop_size)
+            num_parents = int(self.t.elitism * self.pop_size)
             lasting_parents = population[:num_parents]
 
             #get ((1 - self.elitism) * self.pop_size) best children
@@ -426,7 +452,7 @@ class GeneticAlgorithmDriver(Driver):
 
             children = lasting_parents + lasting_children
 
-        if random.random() < .005:
+        if random.random() < self.t.add_random:
             #pick a random child to pop and then replace with random
             index = random.randrange(0, len(children))
             children[index] = self.random_person()
@@ -446,17 +472,13 @@ class GeneticAlgorithmDriver(Driver):
                 index = np.argmin(np.array(fit))
                 return population[index]
 
-            total = 0
-            for i in fit:
-                total += i
-
             population = self.evolve(population, fit)
             #print "leave crossbreed""
             iterations += 1
             print iterations
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Test Genetic Algorithms")
+    parser = argparse.ArgumentParser(description="Genetic Programming: Evolution of Images from Translucent Polygons")
     parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "genetic"],
         help="Type of algorithm to use", default="genetic")
     parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"],
@@ -468,7 +490,7 @@ def parse_args():
     parser.add_argument("--iterations", dest="iterations", type=int, default=None, help="Number of iterations to do.")
     parser.add_argument("--population", dest="population", type=int, default=5, help="Population size.")
     parser.add_argument("--parents", dest="parents", type=int, default=2, help="Number of parents for cross breeding.")
-    parser.add_argument("--elitism", dest="elitism", type=float, default=None, help="Percent of parents to survive.")
+    parser.add_argument("--niche_penalty", dest="niche", type=float, default=0, help="Penalty to be applied to niches.")
 
     parser.add_argument("--thresholds", dest="thresholds", type=str, default=None, help="Path to json file of thresholds.")
 
@@ -478,7 +500,7 @@ def parse_args():
 if __name__=="__main__":
     args = parse_args()
 
-    t = Threshold(args.thresholds, args.population)
+    t = Thresholds(args.thresholds, args.population)
 
     if args.algo == "genetic":
         d = GeneticAlgorithmDriver(args, t)
