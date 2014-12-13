@@ -7,6 +7,7 @@ import copy
 import math
 import time
 import sys
+import json
 
 class Thresholds(object):
     def __init__(self, threshold_file, pop_size):
