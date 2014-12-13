@@ -130,16 +130,16 @@ class Fitness(object):
         self.w = original.shape[1]
         self.h = original.shape[0]
 
-        #for feature matching
-        self.detector = cv2.ORB()
-        self.kp, self.desc = self.detector.detectAndCompute(self.original, None)
-        self.matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
         self.type = type
-        self.num_proc = 3
-        self.pool = Pool(self.num_proc)
-        self.wstarts = [int((self.w / self.num_proc) * i) for i in xrange(self.num_proc)]
-        self.wends = [int((self.w / self.num_proc) * (i + 1)) for i in xrange(self.num_proc)]
+        if type == "euc":
+            self.num_proc = 3
+            self.pool = Pool(self.num_proc)
+            self.wstarts = [int((self.w / self.num_proc) * i) for i in xrange(self.num_proc)]
+            self.wends = [int((self.w / self.num_proc) * (i + 1)) for i in xrange(self.num_proc)]
+        elif type == "feat":
+            self.detector = cv2.ORB()
+            self.kp, self.desc = self.detector.detectAndCompute(self.original, None)
+            self.matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
     def euclidean(self, img):
         '''assumes img and self.original have the same size'''
@@ -186,13 +186,89 @@ class Fitness(object):
         elif (self.type == "feat"):
             return self.feature_matching(img)
 
+class Thresholds(object):
+    def __init__(self, threshold_file, pop_size):
+        #default initiation
+        #POLYGON MUTATION
+        self.opacity = .2
+        self.red = .2
+        self.green = .2
+        self.blue = .2
+        self.points = .2
+        self.remove_point = .5
+        #POPULATION MUTATION
+        self.pop_add = .3
+        self.pop_remove = .3
+        self.pop_mutate_poly = .4
+        #EVOLVE
+        self.mutation = .3
+        self.cross_breed = .7
+        self.elitism = None
+        self.add_random = 0.005
+
+        if threshold_file is not None:
+            #use json to read in dictionary
+            thresholds = json.load(threshold_file)
+
+            #POLYGON MUTATION
+            polygon = thresholds.get("polygon", {})
+            self.opacity = polygon.get("opacity", self.opacity)
+            self.red = polygon.get("red", self.red)
+            self.green = polygon.get("green", self.green)
+            self.blue = polygon.get("blue", self.blue)
+            self.points = polygon.get("points", self.points)
+            self.remove_point = polygon.get("remove_point", self.remove_point)
+
+            total = self.opacity + self.red + self.green + self.blue + self.points + self.remove_point
+            self.opacity = self.opacity / total
+            self.red = self.red / total
+            self.green = self.green / total
+            self.blue = self.blue / total
+            self.points = self.points / total
+            self.remove_point = self.remove_point / total
+
+            #POPULATION MUTATION
+            population = thresholds.get("population", {})
+            self.pop_add = population.get("add", self.pop_add)
+            self.pop_remove = population.get("remove", self.pop_remove)
+            self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
+
+            total = self.pop_add + self.pop_remove + self.pop_mutate_poly
+            self.pop_add = self.pop_add / total
+            self.pop_remove = self.pop_remove / total
+            self.pop_mutate_poly = self.pop_mutate_poly / total
+
+            #EVOLVE
+            evolve = thresholds.get("evolve", {})
+            self.mutation = evolve.get("mutate", self.mutation)
+            self.cross_breed = evolve.get("cross_breed", self.cross_breed)
+            
+            total = self.mutation + self.cross_breed
+            self.mutation = self.mutation / total
+            self.cross_breed = self.cross_breed / total
+            
+            self.add_random = evolve.get("add_random", self.add_random)
+            elitism = evolve.get("elitism", self.elitism)
+            #not valid elitism
+            if elitism <= 0 or elitism is None or elitism > pop_size:
+                self.elitism = None
+            #already proportion
+            elif elitism < 1:
+                self.elitism = elitism
+            #make into proportion
+            else:
+                self.elitism = elitism / pop_size
+
 class Driver(object):
-    def __init__(self, args):
+    def __init__(self, args, t):
         self.original = cv2.imread(args.path)
         self.fit = Fitness(self.original, args.fitness)
         self.iterations = args.iterations
         self.w = self.original.shape[1]
         self.h = self.original.shape[0]
+        self.max_poly = 1
+
+        self.t = t
 
     def draw(self, polygons):
         img = np.zeros(self.original.shape, dtype=np.uint8)
@@ -224,9 +300,20 @@ class Driver(object):
             plys[to_mutate].mutate()
         else:
             plys.append(Polygon(self.w, self.h))
+            if len(plys) > self.max_poly:
+                self.max_poly = len(ply)
         """else:
             to_remove = int(random.random() * len(plys))
             plys.pop(to_remove)"""
+    
+    def random_person(self):
+        person = []
+        num_polys = random.randrange(1,self.max_poly + 1)
+        for i in xrange(num_polys):
+            poly = Polygon(self.w, self.h)
+            num_points = random.randrange(3, 7)
+            for j in xrange(3, num_points):
+                poly.add_vertex()
 
     def fitness(self, plys):
         return self.fit.score(self.draw(plys))
@@ -235,8 +322,8 @@ class Driver(object):
         return None
 
 class HillSteppingDriver(Driver):
-    def __init__(self, args):
-        Driver.__init__(self, args)
+    def __init__(self, args, t):
+        Driver.__init__(self, args, t)
 
     def step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
@@ -248,7 +335,7 @@ class HillSteppingDriver(Driver):
         return newpolygons
 
     def run(self):
-        polygons = [Polygon(self.w, self.h)]
+        polygons = self.random_person()
         iterations = 0
         while True:
             if self.iterations != None and self.iterations == iterations:
@@ -263,50 +350,107 @@ class HillSteppingDriver(Driver):
             print iterations
 
 class GeneticAlgorithmDriver(Driver):
-    def __init__(self, args):
-        Driver.__init__(self, args)
-        self.num_parents = args.num_parents
-        self.num_children = args.num_child
+    def __init__(self, args, t):
+        Driver.__init__(self, args, t)
+        self.pop_size = args.population
 
-    def cross_breed(self, parents, probabilities):
+        if args.parents < self.pop_size:
+            self.num_parents = args.parents
+        else:
+            self.num_parents = 2
+
+    def cross_breed(parents):
+        num_from_parent = 0
+        for p in parents:
+            num_from_parent += len(p)
+
+        #average length / num_parents
+        num_from_parent = size / (2 * len(parents))
+
+        child = []
+        for p in parents:
+            child = child + p[:num_from_parent]
+        return child
+
+    def evolve(self, population, pop_fitness):
         children = []
+        #TODO: NICHE PENALTY
 
-        for i in xrange(self.num_children):
-            #select the parent with a certain probability
-            r = random.random()
-            p = 0
-            while r > probabilities[p]:
-                p += 1
-            parent = parents[p]
+        thresholds = [(1.0 - i / total) for i in pop_fitness]
+        for i in xrange(1, len(thresholds)):
+            thresholds[i] += thresholds[i - 1]
 
-            #mutate
-            child = copy.deepcopy(parent)
-            self.mutate(child)
+        for i in xrange(self.pop_size):
+            if random.random() < .5:
+                #cross breed
+                parents = []
+                parent_indices = set()
+                for i in xrange(self.num_parents):
+                    parent = None
+                    while parent == None:
+                        r = random.random()
+                        p = 0
+                        while r > thresholds[p]:
+                            p += 1
+                        if p not in parent_indices:
+                            parent = thresholds[p]
+
+                for i in parent_indices:
+                    parents.append(population[i])
+
+                child = self.cross_breed(parents)
+            else:
+                #mutate
+                r = random.random()
+                p = 0
+                while r > thresholds[p]:
+                    p += 1
+
+                parent = population[p]
+                child = copy.deepcopy(parent)
+                self.mutate(child)
+
             children.append(child)
+
+        if self.elitism is not None:
+            #get (self.elitism * self.pop_size) best parents
+            population, probabilities = zip(*sorted(zip(population, pop_fitness), key=lambda p:p[1], reverse=True))
+
+            num_parents = int(self.elitism * self.pop_size)
+            lasting_parents = population[:num_parents]
+
+            #get ((1 - self.elitism) * self.pop_size) best children
+            fitness = [self.fitness(c) for c in children]
+            children, fitness = zip(*sorted(zip(children, fitness), key=lambda c:c[1], reverse=True))
+            lasting_children = children[:(self.pop_size - num_parents)]
+
+            children = lasting_parents + lasting_children
+
+        if random.random() < .005:
+            #pick a random child to pop and then replace with random
+            index = random.randrange(0, len(children))
+            children[index] = self.random_person()
 
         return children
 
     def run(self):
         #generate parents
-        parents = [[Polygon(self.w, self.h)] for i in xrange(self.num_parents)]
+        population = [self.random_person() for i in xrange(self.pop_size)]
         iterations = 0
         while True:
             if self.iterations != None and self.iterations == iterations:
                 return polygons
 
-            fit = [self.fitness(p) for p in parents]
+            fit = [self.fitness(p) for p in population]
             if (min(fit) < 1):
                 index = np.argmin(np.array(fit))
-                return parents[index]
+                return population[index]
 
             total = 0
             for i in fit:
                 total += i
-            probabilities = [(1.0 - i / total) for i in fit]
-            for i in xrange(1, len(probabilities)):
-                probabilities[i] += probabilities[i - 1]
 
-            parents = self.cross_breed(parents, probabilities)
+            population = self.evolve(population, fit)
             #print "leave crossbreed""
             iterations += 1
             print iterations
@@ -322,8 +466,11 @@ def parse_args():
     parser.add_argument("--dest", dest="dest", type=str, help="Path for destination image", default = None)
 
     parser.add_argument("--iterations", dest="iterations", type=int, default=None, help="Number of iterations to do.")
-    parser.add_argument("--num_parents", dest="num_parents", type=int, default=5, help="Number of parents to have.")
-    parser.add_argument("--num_child", dest="num_child", type=int, default=5, help="Number of children to have.")
+    parser.add_argument("--population", dest="population", type=int, default=5, help="Population size.")
+    parser.add_argument("--parents", dest="parents", type=int, default=2, help="Number of parents for cross breeding.")
+    parser.add_argument("--elitism", dest="elitism", type=float, default=None, help="Percent of parents to survive.")
+
+    parser.add_argument("--thresholds", dest="thresholds", type=str, default=None, help="Path to json file of thresholds.")
 
     args = parser.parse_args()
     return args
@@ -331,10 +478,12 @@ def parse_args():
 if __name__=="__main__":
     args = parse_args()
 
+    t = Threshold(args.thresholds, args.population)
+
     if args.algo == "genetic":
-        d = GeneticAlgorithmDriver(args)
+        d = GeneticAlgorithmDriver(args, t)
     else:
-        d = HillSteppingDriver(args)
+        d = HillSteppingDriver(args, t)
 
     polygons = d.run()
 
