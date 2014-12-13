@@ -30,45 +30,46 @@ class Thresholds(object):
 
         if threshold_file is not None:
             #use json to read in dictionary
-            thresholds = json.load(threshold_file)
+            with file(threshold_file) as f:
+                thresholds = json.load(f)
 
-            #POLYGON MUTATION
-            polygon = thresholds.get("polygon", {})
-            self.opacity = polygon.get("opacity", self.opacity)
-            self.red = polygon.get("red", self.red)
-            self.green = polygon.get("green", self.green)
-            self.blue = polygon.get("blue", self.blue)
-            self.points = polygon.get("points", self.points)
-            self.remove_point = polygon.get("remove_point", self.remove_point)
+                #POLYGON MUTATION
+                polygon = thresholds.get("polygon", {})
+                self.opacity = polygon.get("opacity", self.opacity)
+                self.red = polygon.get("red", self.red)
+                self.green = polygon.get("green", self.green)
+                self.blue = polygon.get("blue", self.blue)
+                self.points = polygon.get("points", self.points)
+                self.remove_point = polygon.get("remove", self.remove_point)
 
-            #POPULATION MUTATION
-            population = thresholds.get("population", {})
-            self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
-            self.modify_list = population.get("modify", self.modify_list)
-            remove = population.get("remove", self.remove)
-            if 0 <= remove <= 1:
-                self.remove = remove
+                #POPULATION MUTATION
+                population = thresholds.get("population", {})
+                self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
+                self.modify_list = population.get("modify", self.modify_list)
+                remove = population.get("remove", self.remove)
+                if 0 <= remove <= 1:
+                    self.remove = remove
 
-            #EVOLVE
-            evolve = thresholds.get("evolve", {})
+                #EVOLVE
+                evolve = thresholds.get("evolve", {})
 
-            self.niche = abs(evolve.get("niche", self.niche))
-            mutation = evolve.get("mutate", self.mutation)
-            if 0 <= mutation <= 1:
-                self.mutation = mutation
-            
-            self.add_random = evolve.get("add_random", self.add_random)
+                self.niche = abs(evolve.get("niche", self.niche))
+                mutation = evolve.get("mutate", self.mutation)
+                if 0 <= mutation <= 1:
+                    self.mutation = mutation
+                
+                self.add_random = evolve.get("random", self.add_random)
 
-            elitism = evolve.get("elitism", self.elitism)
-            #not valid elitism
-            if elitism <= 0 or elitism is None or elitism > pop_size:
-                self.elitism = None
-            #already proportion
-            elif elitism < 1:
-                self.elitism = elitism
-            #make into proportion
-            else:
-                self.elitism = elitism / pop_size
+                elitism = evolve.get("elitism", self.elitism)
+                #not valid elitism
+                if elitism <= 0 or elitism is None or elitism > pop_size:
+                    self.elitism = None
+                #already proportion
+                elif elitism < 1:
+                    self.elitism = elitism
+                #make into proportion
+                else:
+                    self.elitism = elitism / pop_size
 
         total = self.opacity + self.red + self.green + self.blue + self.points + self.remove_point
         self.opacity = self.opacity / total
