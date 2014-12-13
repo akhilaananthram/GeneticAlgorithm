@@ -298,7 +298,7 @@ class Driver(object):
                         b1 = np.uint8((1.0 - p.opacity) * b0 + p.opacity * p.blue)
                         img[j][i] = [r1, g1, b1]
 
-        cv2.imwrite("temp.png", img)
+        cv2.imwrite("images/temp.png", img)
         return img
 
     def mutate(self, plys):
