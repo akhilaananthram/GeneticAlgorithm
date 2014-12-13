@@ -29,7 +29,7 @@ class Thresholds(object):
         self.remove = 0.05
         #EVOLVE
         self.niche = 0
-        self.mutation = .3
+        self.mutation = .1
         self.elitism = None
         self.add_random = 0
 
