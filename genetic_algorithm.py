@@ -9,6 +9,10 @@ import time
 import sys
 import json
 
+THRESH = None
+WIDTH = 0
+HEIGHT = 0
+
 class Thresholds(object):
     def __init__(self, threshold_file, pop_size):
         #default initiation
@@ -89,24 +93,21 @@ class Thresholds(object):
             self.polygon[i] += self.polygon[i - 1]
 
 class Polygon(object):
-    def __init__(self, xbound, ybound, t, points=None, red = None, blue = None, green = None, opacity = None):
+    def __init__(self, points=None, red = None, blue = None, green = None, opacity = None):
         self.points = points
         if points is None:
-            self.points = []
+            self.points = [None] * 3
 
-            x = int(random.random() * xbound)
-            y = int(random.random() * ybound)
-            self.points.append([x,y])
-            x = int(random.random() * xbound)
-            y = int(random.random() * ybound)
-            self.points.append([x,y])
-            x = int(random.random() * xbound)
-            y = int(random.random() * ybound)
-            self.points.append([x,y])
+            x = int(random.random() * WIDTH)
+            y = int(random.random() * HEIGHT)
+            self.points[0] = [x,y]
+            x = int(random.random() * WIDTH)
+            y = int(random.random() * HEIGHT)
+            self.points[1] = [x,y]
+            x = int(random.random() * WIDTH)
+            y = int(random.random() * HEIGHT)
+            self.points[2] = [x,y]
             self.order_vertices()
-
-        self.xbound = xbound
-        self.ybound = ybound
 
         self.red = red
         if red is None:
@@ -124,11 +125,9 @@ class Polygon(object):
         if opacity is None:
             self.opacity = random.random()
 
-        self.t = t
-
     def add_vertex(self):
-        x = int(random.random() * self.xbound)
-        y = int(random.random() * self.ybound)
+        x = int(random.random() * WIDTH)
+        y = int(random.random() * HEIGHT)
         self.points.append([x,y])
         self.order_vertices()
 
@@ -164,17 +163,17 @@ class Polygon(object):
 
     def mutate(self):
         mutation = random.random()
-        if(mutation < self.t.polygon[0]):
+        if(mutation < THRESH.polygon[0]):
             self.change_opacity()
-        elif(mutation < self.t.polygon[1]):
+        elif(mutation < THRESH.polygon[1]):
             self.change_red()
-        elif(mutation < self.t.polygon[2]):
+        elif(mutation < THRESH.polygon[2]):
             self.change_green()
-        elif (mutation < self.t.polygon[3]):
+        elif (mutation < THRESH.polygon[3]):
             self.change_blue()
         else:
             if(len(self.points)> 3):
-                if(random.random() < self.t.remove_point):
+                if(random.random() < THRESH.remove_point):
                     self.remove_vertex()
                 else:
                     self.add_vertex()
@@ -184,8 +183,6 @@ class Polygon(object):
     def __str__(self):
         poly = {
             "points" : self.points,
-            "xbound" : self.xbound,
-            "ybound" : self.ybound,
             "red" : self.red,
             "blue" : self.blue,
             "green" : self.green,
@@ -195,33 +192,38 @@ class Polygon(object):
         return json.dumps(poly)
 
 def euclidean_helper(args):
-    img, original, wstart, wend = args
+    img, original, wstart, wend, step = args
     '''assumes img and self.original have the same size'''
     #set up
     distance = 0.0
 
-    for i in xrange(wstart, wend):
-        for j in xrange(original.shape[0]):
+    for i in xrange(wstart, wend, step):
+        for j in xrange(0, original.shape[0], step):
             distance += np.linalg.norm(img[j][i] - original[j][i])
 
     return distance
 
 class Fitness(object):
-    def __init__(self, original, type="euc"):
+    def __init__(self, original, type="euc", sample=1, pool=None):
         self.original = original
-        self.w = original.shape[1]
-        self.h = original.shape[0]
 
         self.type = type
         if type == "euc":
-            self.num_proc = 3
-            self.pool = Pool(self.num_proc)
-            self.wstarts = [int((self.w / self.num_proc) * i) for i in xrange(self.num_proc)]
-            self.wends = [int((self.w / self.num_proc) * (i + 1)) for i in xrange(self.num_proc)]
+            if pool is not None:
+                self.pool = pool
+                self.num_proc = pool._processes
+            else:
+                self.num_proc = 3
+                self.pool = Pool(self.num_proc)
+
+            self.wstarts = [int((WIDTH / self.num_proc) * i) for i in xrange(self.num_proc)]
+            self.wends = [int((WIDTH / self.num_proc) * (i + 1)) for i in xrange(self.num_proc)]
         elif type == "feat":
             self.detector = cv2.ORB()
             self.kp, self.desc = self.detector.detectAndCompute(self.original, None)
             self.matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+        self.step = sample
 
     def euclidean(self, img):
         '''assumes img and self.original have the same size'''
@@ -229,12 +231,12 @@ class Fitness(object):
         distance = 0.0
 
         #pass to pool
-        results = self.pool.map(euclidean_helper, [(img, self.original, self.wstarts[i], self.wends[i]) for i in xrange(self.num_proc)])
+        results = self.pool.map(euclidean_helper, [(img, self.original, self.wstarts[i], self.wends[i], self.step) for i in xrange(self.num_proc)])
 
         for r in results:
           distance += r
 
-        distance = distance / (self.w * self.h)
+        distance = distance / (WIDTH * HEIGHT)
 
         #end = time.time()
         #print end - start
@@ -268,24 +270,42 @@ class Fitness(object):
         elif (self.type == "feat"):
             return self.feature_matching(img)
 
+def mutate(plys):
+    val = random.random()
+    if(val < THRESH.pop_mutate_poly and len(plys) != 0):
+        to_mutate = random.randrange(0, len(plys))
+        plys[to_mutate].mutate()
+    else:
+        if len(plys) > 0:
+            if (random.random() < THRESH.remove):
+                to_remove = int(random.random() * len(plys))
+                plys.pop(to_remove)
+            else:
+                plys.append(Polygon())
+        else:
+            plys.append(Polygon())
+
 class Driver(object):
-    def __init__(self, args, t):
+    def __init__(self, args):
+        global WIDTH, HEIGHT, THRESH
         self.original = cv2.imread(args.path)
-        self.fit = Fitness(self.original, args.fitness)
+        WIDTH = self.original.shape[1]
+        HEIGHT = self.original.shape[0]
+        THRESH = Thresholds(args.thresholds, args.population)
+
+        self.num_proc = 3
+        self.pool = Pool(self.num_proc)
+        self.fit = Fitness(self.original, args.fitness, args.sample, self.pool)
         self.iterations = args.iterations
-        self.w = self.original.shape[1]
-        self.h = self.original.shape[0]
         self.max_poly = 1
 
-        self.t = t
-
     def draw(self, polygons):
-        img = np.zeros(self.original.shape, dtype=np.uint8)
+        img = np.zeros(self.original.shape)
         
         for p in polygons:
             poly = np.array(p.points, np.int32)
             h, w, _ = img.shape
-            mask = np.zeros((h,w), dtype=np.uint8)
+            mask = np.zeros((h,w))
             cv2.fillPoly(mask, [poly], 1)
 
             #opacity
@@ -294,43 +314,25 @@ class Driver(object):
                     #polygon exists there
                     if mask[j][i]:
                         b0, g0, r0 = img[j][i]
-                        r1 = np.uint8((1.0 - p.opacity) * r0 + p.opacity * p.red)
-                        g1 = np.uint8((1.0 - p.opacity) * g0 + p.opacity * p.green)
-                        b1 = np.uint8((1.0 - p.opacity) * b0 + p.opacity * p.blue)
+                        r1 = (1.0 - p.opacity) * r0 + p.opacity * p.red
+                        g1 = (1.0 - p.opacity) * g0 + p.opacity * p.green
+                        b1 = (1.0 - p.opacity) * b0 + p.opacity * p.blue
                         img[j][i] = [r1, g1, b1]
 
         cv2.imwrite("images/temp.png", img)
         return img
-
-    def mutate(self, plys):
-        val = random.random()
-        if(val < self.t.pop_mutate_poly and len(plys) != 0):
-            to_mutate = random.randrange(0, len(plys))
-            plys[to_mutate].mutate()
-        else:
-            if len(plys) > 0:
-                if (random.random() < self.t.remove):
-                    to_remove = int(random.random() * len(plys))
-                    plys.pop(to_remove)
-                else:
-                    plys.append(Polygon(self.w, self.h, self.t))
-                    if len(plys) > self.max_poly:
-                        self.max_poly = len(plys)
-            else:
-                plys.append(Polygon(self.w, self.h, self.t))
-                if len(plys) > self.max_poly:
-                    self.max_poly = len(plys)
     
     def random_person(self):
-        person = []
         num_polys = random.randrange(1,self.max_poly + 1)
+
+        person = [None] * num_polys
         for i in xrange(num_polys):
-            poly = Polygon(self.w, self.h, self.t)
+            poly = Polygon()
             num_points = random.randrange(3, 7)
             for j in xrange(3, num_points):
                 poly.add_vertex()
 
-            person.append(poly)
+            person[i] = poly
 
         return person
 
@@ -341,16 +343,16 @@ class Driver(object):
         return None
 
 class HillSteppingDriver(Driver):
-    def __init__(self, args, t):
-        Driver.__init__(self, args, t)
+    def __init__(self, args):
+        Driver.__init__(self, args)
 
     def step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
-        self.mutate(newpolygons)
+        mutate(newpolygons)
 
         while(self.fitness(newpolygons) >= fit):
             newpolygons = copy.deepcopy(polygons)
-            self.mutate(newpolygons)
+            mutate(newpolygons)
         return newpolygons
 
     def run(self):
@@ -368,9 +370,48 @@ class HillSteppingDriver(Driver):
             iterations += 1
             print iterations
 
+def create_child(args):
+    population, pop_thresholds, num_parents = args
+
+    #cross breed
+    parents = [None] * num_parents
+    parent_indices = set()
+    for i in xrange(num_parents):
+        parent = None
+        while parent == None:
+            r = random.random()
+            p = 0
+            while r > pop_thresholds[p]:
+                p += 1
+            if p not in parent_indices:
+                parent = p
+        parent_indices.add(parent)
+
+    j = 0
+    num_from_parent = 0
+    for i in parent_indices:
+        parents[j] = population[i]
+        num_from_parent += len(parents[i])
+        j += 1
+
+    #average length / num_parents
+    num_from_parent = num_from_parent / len(parents)
+
+    child = []
+    for p in parents:
+        child = child + copy.deepcopy(p[:num_from_parent])
+
+    random.shuffle(child)
+
+    #mutate
+    if random.random() < THRESH.pop_mutate_poly:
+        mutate(child)
+
+    return child
+
 class GeneticAlgorithmDriver(Driver):
-    def __init__(self, args, t):
-        Driver.__init__(self, args, t)
+    def __init__(self, args):
+        Driver.__init__(self, args)
         self.pop_size = args.population
 
         if args.parents < self.pop_size:
@@ -380,32 +421,16 @@ class GeneticAlgorithmDriver(Driver):
 
         self.niche_penalty = abs(args.niche)
 
-    def cross_breed(self, parents):
-        num_from_parent = 0
-        for p in parents:
-            num_from_parent += len(p)
-
-        #average length / num_parents
-        num_from_parent = num_from_parent / len(parents)
-
-        child = []
-        for p in parents:
-            child = child + copy.deepcopy(p[:num_from_parent])
-
-        random.shuffle(child)
-
-        return child
-
     def evolve(self, population, pop_fitness):
-        children = []
+        #start = time.time()
         #niche penalty
         if self.niche_penalty != 0:
             temp = pop_fitness
             for i in xrange(len(pop_fitness)):
                 for j in xrange(i + 1, len(pop_fitness)):
-                    if abs(temp[i] - temp[j]) < self.t.niche:
+                    if abs(temp[i] - temp[j]) < THRESH.niche:
                         pop_fitness[i] = max(0, temp[i] - self.niche_penalty)
-                        pop_fitness[j] = max(0, temp[i] - self.niche_penalty)
+                        pop_fitness[j] = max(0, temp[j] - self.niche_penalty)
 
         total = 0
         for i in pop_fitness:
@@ -415,36 +440,14 @@ class GeneticAlgorithmDriver(Driver):
         for i in xrange(1, len(thresholds)):
             thresholds[i] += thresholds[i - 1]
 
-        for i in xrange(self.pop_size):
-            #cross breed
-            parents = []
-            parent_indices = set()
-            for i in xrange(self.num_parents):
-                parent = None
-                while parent == None:
-                    r = random.random()
-                    p = 0
-                    while r > thresholds[p]:
-                        p += 1
-                    if p not in parent_indices:
-                        parent = p
-                parent_indices.add(parent)
+        #children = self.pool.map(create_child, [(population, thresholds, self.num_parents) for i in xrange(self.pop_size)])
+        children = [create_child((population, thresholds, self.num_parents)) for i in xrange(self.pop_size)]
 
-            for i in parent_indices:
-                parents.append(population[i])
-
-            child = self.cross_breed(parents)
-
-            if random.random() < self.t.mutation:
-                self.mutate(child)
-
-            children.append(child)
-
-        if self.t.elitism is not None:
+        if THRESH.elitism is not None:
             #get (self.elitism * self.pop_size) best parents
             population, probabilities = zip(*sorted(zip(population, pop_fitness), key=lambda p:p[1], reverse=True))
 
-            num_parents = int(self.t.elitism * self.pop_size)
+            num_parents = int(THRESH.elitism * self.pop_size)
             lasting_parents = population[:num_parents]
 
             #get ((1 - self.elitism) * self.pop_size) best children
@@ -454,11 +457,13 @@ class GeneticAlgorithmDriver(Driver):
 
             children = lasting_parents + lasting_children
 
-        if random.random() < self.t.add_random:
+        if random.random() < THRESH.add_random:
             #pick a random child to pop and then replace with random
             index = random.randrange(0, len(children))
             children[index] = self.random_person()
 
+        #end = time.time()
+        #print end - start
         return children
 
     def run(self):
@@ -487,6 +492,8 @@ def parse_args():
         help="Type of algorithm to use", default="genetic")
     parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"],
         help="Type of fitness function to use.")
+    parser.add_argument("--sample", dest="sample", default=1,
+        help="Use just a sample of the image for the fitness function.")
 
     parser.add_argument("--path", dest="path", type=str, help="Path to image. REQUIRED", required=True)
     parser.add_argument("--dest", dest="dest", type=str, help="Path for destination image", default = None)
@@ -504,12 +511,10 @@ def parse_args():
 if __name__=="__main__":
     args = parse_args()
 
-    t = Thresholds(args.thresholds, args.population)
-
     if args.algo == "genetic":
-        d = GeneticAlgorithmDriver(args, t)
+        d = GeneticAlgorithmDriver(args)
     else:
-        d = HillSteppingDriver(args, t)
+        d = HillSteppingDriver(args)
 
     polygons = d.run()
 
