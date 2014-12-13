@@ -1,0 +1,23 @@
+{
+  "polygon" : {
+    "opacity" : 0.2,
+    "red" : 0.2,
+    "green" : 0.2,
+    "blue" : 0.2,
+    "points" : 0.2,
+    "remove" : 0.5
+  },
+
+  "population" : {
+    "mutate" : 0.4,
+    "modify" : 0.6,
+    "remove" : 0.05
+  },
+
+  "evolve" : {
+    "niche" : 0,
+    "mutate" : 0.3,
+    "elitism" : null,
+    "random" : 0
+  }
+}
