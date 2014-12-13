@@ -460,12 +460,14 @@ class GeneticAlgorithmDriver(Driver):
         return children
 
     def run(self):
-        #generate parents
+        #generate population
         population = [self.random_person() for i in xrange(self.pop_size)]
         iterations = 0
         while True:
             if self.iterations != None and self.iterations == iterations:
-                return polygons
+                fit = [self.fitness(p) for p in population]
+                index = np.argmin(np.array(fit))
+                return population[index]
 
             fit = [self.fitness(p) for p in population]
             if (min(fit) < 1):
