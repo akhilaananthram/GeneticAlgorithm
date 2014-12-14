@@ -416,28 +416,6 @@ def create_child(args):
     num_from_parent = sum(map(len, parents)) / len(parents)
     for p in parents:
         child = child + copy.deepcopy(reservoir_sampling(p, num_from_parent))
-        '''if len(p) <= num_from_parent:
-            for gene in p:
-                child.append(copy.deepcopy(gene))
-        else:
-            for gene in p[len(p) - num_from_parent:]:
-                child.append(copy.deepcopy(gene))
-            #for k in xrange(j,len(p), len(parent_indices)):
-            #    child.append(copy.deepcopy(p[k]))
-        #j += 1'''
-
-    '''j = 0
-    num_from_parent = 0
-    for i in parent_indices:
-          parents[j] = population[i]
-          num_from_parent += len(parents[i])
-          j += 1
-
-    #average length / num_parents
-    num_from_parent = num_from_parent / len(parents)
-
-    for p in parents:
-        child = child + copy.deepcopy(p[:num_from_parent])'''
 
     #mutate
     if random.random() < THRESH.pop_mutate_poly:
@@ -458,8 +436,6 @@ class GeneticAlgorithmDriver(Driver):
         self.niche_penalty = abs(args.niche)
 
     def evolve(self, population, pop_fitness):
-        
-        #start = time.time()
         #niche penalty
         if self.niche_penalty != 0:
             temp = pop_fitness
@@ -505,8 +481,6 @@ class GeneticAlgorithmDriver(Driver):
             index = random.randrange(0, len(children))
             children[index] = self.random_person()
 
-        #end = time.time()
-        #print end - start
         return children
 
     def run(self):
