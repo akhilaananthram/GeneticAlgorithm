@@ -186,7 +186,7 @@ class Polygon(object):
             "red" : self.red,
             "blue" : self.blue,
             "green" : self.green,
-            "opacitiy" : self.opacity
+            "opacity" : self.opacity
             }
 
         return json.dumps(poly)
@@ -279,7 +279,8 @@ def mutate(plys):
         if len(plys) > 0:
             if (random.random() < THRESH.remove):
                 to_remove = int(random.random() * len(plys))
-                plys.pop(to_remove)
+                p = plys.pop(to_remove)
+                del p
             else:
                 plys.append(Polygon())
         else:
@@ -370,12 +371,26 @@ class HillSteppingDriver(Driver):
             iterations += 1
             print iterations
 
+def reservoir_sampling(parent, num_genes):
+    genes = [None] * min(len(parent), num_genes)
+
+    for i in xrange(len(genes)):
+        genes[i] = parent[i]
+
+    for i in xrange(len(genes), len(parent)):
+        j = random.randrange(0, i)
+
+        if j <= len(genes):
+            genes[j] = parent[i]
+
+    return genes
+
 def create_child(args):
     population, pop_thresholds, num_parents = args
 
     #cross breed
-    parents = [None] * num_parents
     parent_indices = set()
+    parents = [None] * num_parents
     for i in xrange(num_parents):
         parent = None
         while parent == None:
@@ -387,21 +402,39 @@ def create_child(args):
                 parent = p
         parent_indices.add(parent)
 
+    child = []
     j = 0
+    for i in parent_indices:
+        p = population[i]
+        parents[j] = population[i]
+        j += 1
+        
+    #j = 0
+    num_from_parent = sum(map(len, parents)) / len(parents)
+    for p in parents:
+        child = child + copy.deepcopy(reservoir_sampling(p, num_from_parent))
+        '''if len(p) <= num_from_parent:
+            for gene in p:
+                child.append(copy.deepcopy(gene))
+        else:
+            for gene in p[len(p) - num_from_parent:]:
+                child.append(copy.deepcopy(gene))
+            #for k in xrange(j,len(p), len(parent_indices)):
+            #    child.append(copy.deepcopy(p[k]))
+        #j += 1'''
+
+    '''j = 0
     num_from_parent = 0
     for i in parent_indices:
-        parents[j] = population[i]
-        num_from_parent += len(parents[i])
-        j += 1
+          parents[j] = population[i]
+          num_from_parent += len(parents[i])
+          j += 1
 
     #average length / num_parents
     num_from_parent = num_from_parent / len(parents)
 
-    child = []
     for p in parents:
-        child = child + copy.deepcopy(p[:num_from_parent])
-
-    random.shuffle(child)
+        child = child + copy.deepcopy(p[:num_from_parent])'''
 
     #mutate
     if random.random() < THRESH.pop_mutate_poly:
@@ -440,8 +473,8 @@ class GeneticAlgorithmDriver(Driver):
         for i in xrange(1, len(thresholds)):
             thresholds[i] += thresholds[i - 1]
 
-        #children = self.pool.map(create_child, [(population, thresholds, self.num_parents) for i in xrange(self.pop_size)])
-        children = [create_child((population, thresholds, self.num_parents)) for i in xrange(self.pop_size)]
+        children = self.pool.map(create_child, [(population, thresholds, self.num_parents) for i in xrange(self.pop_size)])
+        #children = [create_child((population, thresholds, self.num_parents)) for i in xrange(self.pop_size)]
 
         if THRESH.elitism is not None:
             #get (self.elitism * self.pop_size) best parents
@@ -449,13 +482,17 @@ class GeneticAlgorithmDriver(Driver):
 
             num_parents = int(THRESH.elitism * self.pop_size)
             lasting_parents = population[:num_parents]
+            del population[num_parents:]
 
             #get ((1 - self.elitism) * self.pop_size) best children
             fitness = [self.fitness(c) for c in children]
             children, fitness = zip(*sorted(zip(children, fitness), key=lambda c:c[1], reverse=True))
             lasting_children = children[:(self.pop_size - num_parents)]
+            del children[(self.pop_size - num_parents):]
 
             children = lasting_parents + lasting_children
+        else:
+            del population
 
         if random.random() < THRESH.add_random:
             #pick a random child to pop and then replace with random
