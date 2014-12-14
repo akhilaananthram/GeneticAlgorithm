@@ -288,11 +288,10 @@ def mutate(plys):
 
 class Driver(object):
     def __init__(self, args):
-        global WIDTH, HEIGHT, THRESH
+        global WIDTH, HEIGHT
         self.original = cv2.imread(args.path)
         WIDTH = self.original.shape[1]
         HEIGHT = self.original.shape[0]
-        THRESH = Thresholds(args.thresholds, args.population)
 
         self.num_proc = 3
         self.pool = Pool(self.num_proc)
@@ -338,7 +337,11 @@ class Driver(object):
         return person
 
     def fitness(self, plys):
-        return self.fit.score(self.draw(plys))
+        img = self.draw(plys)
+        f = self.fit.score(img)
+        del img
+
+        return f
 
     def run(self):
         return None
@@ -547,6 +550,7 @@ def parse_args():
 
 if __name__=="__main__":
     args = parse_args()
+    THRESH = Thresholds(args.thresholds, args.population)
 
     if args.algo == "genetic":
         d = GeneticAlgorithmDriver(args)
