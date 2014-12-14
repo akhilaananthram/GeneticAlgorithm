@@ -458,6 +458,7 @@ class GeneticAlgorithmDriver(Driver):
         self.niche_penalty = abs(args.niche)
 
     def evolve(self, population, pop_fitness):
+        
         #start = time.time()
         #niche penalty
         if self.niche_penalty != 0:
@@ -496,6 +497,8 @@ class GeneticAlgorithmDriver(Driver):
             children = lasting_parents + lasting_children
         else:
             del population
+        del thresholds
+        del pop_fitness
 
         if random.random() < THRESH.add_random:
             #pick a random child to pop and then replace with random
@@ -520,7 +523,6 @@ class GeneticAlgorithmDriver(Driver):
             if (min(fit) < 1):
                 index = np.argmin(np.array(fit))
                 return population[index]
-
             population = self.evolve(population, fit)
             #print "leave crossbreed""
             iterations += 1
