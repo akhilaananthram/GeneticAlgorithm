@@ -56,10 +56,12 @@ We developed two different fitness functions, and sampled using both. Our basic 
 
 \subsection{Results}
 
+Because of our language choice, our program is extremely slow.  Our first thought was to parallelize the program as much as possible.  Our first attempt was using Python's ThreadPool. Unfortunately, Python uses a Global Interpreter Lock.  Thus, adding multi-threading did not improve the performance.  In fact, it actually slowed us down.  We then looked into multi-processing. Because of hardare limitations, we decided to use 3 sub-processes.  We were able to parallelize the fitness function and the creation of children.  However, we reached an interesting roadblock on Windows with multi-processing when we were attempting to access global variables from a sub-process.  On Unix based systems, Python's multiprocessing uses fork(), giving every child process a copy of its parent's address space, including global variables.  However, this is not the case for Windows.  Any variable from a parent process that is accessed by a child must be explicitely passed along.
+
 \section{Related Work}
 
 \section{Future Work}
-There were a few things that developed as we worked on the project. For one, working in python severly limited our speed. We did get the results we needed, but we were constrained to smaller images. It would have been nice to support much larger images, which would have opened up different fitness functions to us, as it would have improved feature matching. The project we had used as inspiration had been written in c\#, and though we didn't think the difference in languages would have such a significant effect, it seems to be huge.
+There were a few things that developed as we worked on the project. For one, working in Python severly limited our speed. We did get the results we needed, but we were constrained to smaller images. It would have been nice to support much larger images, which would have opened up different fitness functions to us, as it would have improved feature matching. The project we had used as inspiration had been written in c\#, and though we didn't think the difference in languages would have such a significant effect, it seems to be huge.
 
 \section{Conclusion}
 
