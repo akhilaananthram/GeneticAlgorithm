@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.1)  14 DEC 2014 23:00
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.1)  14 DEC 2014 23:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -506,15 +506,15 @@ port.aux) )
 Here is how much of TeX's memory you used:
  3114 strings out of 493308
  40595 string characters out of 6141368
- 110685 words of memory out of 5000000
+ 111685 words of memory out of 5000000
  6524 multiletter control sequences out of 15000+600000
  7749 words of font info for 30 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 38i,7n,24p,986b,201s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,7n,24p,985b,201s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pf
 b><c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texl
 ive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on aireport.pdf (3 pages, 52139 bytes).
+Output written on aireport.pdf (3 pages, 52728 bytes).
 PDF statistics:
  26 PDF objects out of 1000 (max. 8388607)
  17 compressed objects within 1 object stream

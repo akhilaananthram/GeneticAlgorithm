@@ -15,11 +15,11 @@
 \section{Introduction}
 Genetic Algorithms are a very interesting and unexplored area of Computer Science. We decided it would be interesting to apply genetic algorithms to different solved problems, and see if we could find improvements in performance. 
 
-The problem we decided to analyze was that of generating an image out of translucent polygons. We found a project (SOURCE) that given a source image, will modify a canvas by adding polygons, removing polygons, adding or subtracting vertexes to polygons, moving polygons, changing their color or their transparency. He claimed that he was using genetic algorithms, but on inspection, he had actually used hill stepping. He would generate a child through mutation, see if this was closer to the source image, if it was keep it, if else, throw it away. This isn't really an example of genetic algorithms as there is a guarantee that the next generation is better than the previous one. We were wondering if genetic algorithms could be applied to this problem, and even show some improvements in performance. 
+The problem we decided to analyze was that of generating an image out of translucent polygons. We found a project that given a source image, will modify a canvas by adding polygons, removing polygons, adding or subtracting vertexes to polygons, moving polygons, changing their color or their transparency. He claimed that he was using genetic algorithms, but on inspection, he had actually used hill stepping. He would generate a child through mutation, see if this was closer to the source image, if it was keep it, if else, throw it away. This isn't really an example of genetic algorithms as there is a guarantee that the next generation is better than the previous one. We were wondering if genetic algorithms could be applied to this problem, and even show some improvements in performance. 
 
 We theorized that looking at how genetic algorithms change the performance of this algorithm would give us a much better understanding of real world applications of genetic algorithms, and what their best use case is. From here, we could more accurately identify problems that would benefit from this approach to solving problems. We will vary our approach to genetic algorithms, and try a bunch of modifications to it, modifiers like elitism and multiple parents. We'll then compare the amount of iterations it takes, on average, for hill climbing vs genetic algorithms to get to a certain fitness threshold when compared to the source image.
 
-WE FOUND
+We found that, at least for this type of problem, hill stepping was a far faster and superior approach to the problem. We can't speak for sure about the number of iterations needed to get to a certain fitness, but we can say that the time needed for one iteration in hill stepping is several magnitudes lower than the time needed for genetic algorithms.
 
 
 \section{Problem Definition and Methods}
@@ -55,8 +55,9 @@ We developed two different fitness functions, and sampled using both. Our basic 
 \subsection{Methodology}
 
 \subsection{Results}
+Unfortunately, we didn't get to test this as much as we had planned. Python ended up being way slower than we had planned on, so even one iteration of genetic algorithms would take about an hour, whereas our hill stepping, where an iteration would take a few seconds at the most, needed over a thousand iterations to converge to acceptable fitness.
 
-Because of our language choice, our program is extremely slow.  Our first thought was to parallelize the program as much as possible.  Our first attempt was using Python's ThreadPool. Unfortunately, Python uses a Global Interpreter Lock.  Thus, adding multi-threading did not improve the performance.  In fact, it actually slowed us down.  We then looked into multi-processing. Because of hardare limitations, we decided to use 3 sub-processes.  We were able to parallelize the fitness function and the creation of children.  However, we reached an interesting roadblock on Windows with multi-processing when we were attempting to access global variables from a sub-process.  On Unix based systems, Python's multiprocessing uses fork(), giving every child process a copy of its parent's address space, including global variables.  However, this is not the case for Windows.  Any variable from a parent process that is accessed by a child must be explicitely passed along.
+Because of our language choice, our program is extremely slow.  Our first thought was to parallelize the program as much as possible, our first attempt was using Python's ThreadPool. Unfortunately, Python uses a Global Interpreter Lock.  Thus, adding multi-threading did not improve the performance.  In fact, it actually slowed us down.  We then looked into multi-processing. Because of hardare limitations, we decided to use 3 sub-processes.  We were able to parallelize the fitness function and the creation of children.  However, we reached an interesting roadblock on Windows with multi-processing when we were attempting to access global variables from a sub-process.  On Unix based systems, Python's multiprocessing uses fork(), giving every child process a copy of its parent's address space, including global variables.  However, this is not the case for Windows.  Any variable from a parent process that is accessed by a child must be explicitely passed along.
 
 Another way we attempted to speed up our program was by adding the ability to apply the fitness function to just a sample of the image.  As the polygons are never going to match the picture's pixels exactly, we can look at just a sample.
 
@@ -70,6 +71,6 @@ There were a few things that developed as we worked on the project. For one, wor
 I'd l
 
 
-
+http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
 
 \end{document}
