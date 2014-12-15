@@ -58,6 +58,8 @@ We developed two different fitness functions, and sampled using both. Our basic 
 
 Because of our language choice, our program is extremely slow.  Our first thought was to parallelize the program as much as possible.  Our first attempt was using Python's ThreadPool. Unfortunately, Python uses a Global Interpreter Lock.  Thus, adding multi-threading did not improve the performance.  In fact, it actually slowed us down.  We then looked into multi-processing. Because of hardare limitations, we decided to use 3 sub-processes.  We were able to parallelize the fitness function and the creation of children.  However, we reached an interesting roadblock on Windows with multi-processing when we were attempting to access global variables from a sub-process.  On Unix based systems, Python's multiprocessing uses fork(), giving every child process a copy of its parent's address space, including global variables.  However, this is not the case for Windows.  Any variable from a parent process that is accessed by a child must be explicitely passed along.
 
+Another way we attempted to speed up our program was by adding the ability to apply the fitness function to just a sample of the image.  As the polygons are never going to match the picture's pixels exactly, we can look at just a sample.
+
 \section{Related Work}
 
 \section{Future Work}
