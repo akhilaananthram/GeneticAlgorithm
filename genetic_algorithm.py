@@ -389,7 +389,7 @@ def reservoir_sampling(parent, num_genes):
     return genes
 
 def create_child(args):
-    population, pop_thresholds, num_parents = args
+    population, pop_thresholds, num_parents, t = args
 
     #cross breed
     parent_indices = set()
@@ -418,7 +418,7 @@ def create_child(args):
         child = child + copy.deepcopy(reservoir_sampling(p, num_from_parent))
 
     #mutate
-    if random.random() < THRESH.pop_mutate_poly:
+    if random.random() < t.pop_mutate_poly:
         mutate(child)
 
     return child
@@ -453,8 +453,8 @@ class GeneticAlgorithmDriver(Driver):
         for i in xrange(1, len(thresholds)):
             thresholds[i] += thresholds[i - 1]
 
-        children = self.pool.map(create_child, [(population, thresholds, self.num_parents) for i in xrange(self.pop_size)])
-        #children = [create_child((population, thresholds, self.num_parents)) for i in xrange(self.pop_size)]
+        children = self.pool.map(create_child, [(population, thresholds, self.num_parents, THRESH) for i in xrange(self.pop_size)])
+        #children = [create_child((population, thresholds, self.num_parents, THRESH)) for i in xrange(self.pop_size)]
 
         if THRESH.elitism is not None:
             #get (self.elitism * self.pop_size) best parents
