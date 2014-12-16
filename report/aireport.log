@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.1)  14 DEC 2014 23:12
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/W32TeX) (format=pdflatex 2014.3.1)  16 DEC 2014 14:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -372,21 +372,24 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Gm@layouthoffset=\dimen120
 \Gm@layoutvoffset=\dimen121
 \Gm@dimlist=\toks22
+)
+(c:/texlive/2013/texmf-dist/tex/latex/tools/indentfirst.sty
+Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
 ) (./aireport.aux)
 \openout1 = `aireport.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
 
 (c:/texlive/2013/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -445,15 +448,15 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Info: Redefining \celsius on input line 13.
-Package gensymb Info: Faking symbols for \degree and \celsius on input line 13.
+LaTeX Info: Redefining \celsius on input line 16.
+Package gensymb Info: Faking symbols for \degree and \celsius on input line 16.
 
 
 
 Package gensymb Warning: Not defining \perthousand.
 
-LaTeX Info: Redefining \ohm on input line 13.
-Package gensymb Info: Using \Omega for \ohm on input line 13.
+LaTeX Info: Redefining \ohm on input line 16.
+Package gensymb Info: Using \Omega for \ohm on input line 16.
 
 Package gensymb Warning: Not defining \micro.
 
@@ -465,14 +468,14 @@ Package gensymb Warning: Not defining \micro.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(56.9055pt, 500.484pt, 56.9055pt)
+* h-part:(L,W,R)=(85.35826pt, 443.57848pt, 85.35826pt)
 * v-part:(T,H,B)=(56.9055pt, 681.15898pt, 56.9055pt)
 * \paperwidth=614.295pt
 * \paperheight=794.96999pt
-* \textwidth=500.484pt
+* \textwidth=443.57848pt
 * \textheight=681.15898pt
-* \oddsidemargin=-15.36449pt
-* \evensidemargin=-15.36449pt
+* \oddsidemargin=13.08827pt
+* \evensidemargin=13.08827pt
 * \topmargin=-52.36449pt
 * \headheight=12.0pt
 * \headsep=25.0pt
@@ -491,33 +494,44 @@ Package gensymb Warning: Not defining \micro.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 14.
+LaTeX Font Info:    Try loading font information for U+msa on input line 17.
 (c:/texlive/2013/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 14.
+LaTeX Font Info:    Try loading font information for U+msb on input line 17.
 
 (c:/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{c:/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] (./aire
-port.aux) ) 
+{c:/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
+Overfull \hbox (3.65742pt too wide) in paragraph at lines 56--57
+[]\OT1/cmr/m/n/12 To ad-dress the mem-ory prob-lem, we looked into ways to man-
+u-ally man-age Python's
+ []
+
+[3]
+Overfull \hbox (3.43103pt too wide) in paragraph at lines 76--77
+[]\OT1/cmr/m/n/12 http://rogeralsing.com/2008/12/07/genetic-programming-evoluti
+on-of-mona-lisa/ 
+ []
+
+[4] (./aireport.aux) ) 
 Here is how much of TeX's memory you used:
- 3114 strings out of 493308
- 40595 string characters out of 6141368
- 111685 words of memory out of 5000000
- 6524 multiletter control sequences out of 15000+600000
+ 3121 strings out of 493308
+ 40823 string characters out of 6141368
+ 110749 words of memory out of 5000000
+ 6527 multiletter control sequences out of 15000+600000
  7749 words of font info for 30 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 38i,7n,24p,985b,201s stack positions out of 5000i,500n,10000p,200000b,80000s
-<c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pf
-b><c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texl
-ive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on aireport.pdf (3 pages, 52728 bytes).
+ 38i,7n,24p,1602b,201s stack positions out of 5000i,500n,10000p,200000b,80000s
+<c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmbx12.pfb><c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.p
+fb><c:/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
+Output written on aireport.pdf (4 pages, 56771 bytes).
 PDF statistics:
- 26 PDF objects out of 1000 (max. 8388607)
- 17 compressed objects within 1 object stream
+ 29 PDF objects out of 1000 (max. 8388607)
+ 19 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
