@@ -227,7 +227,6 @@ class Fitness(object):
 
     def euclidean(self, img):
         '''assumes img and self.original have the same size'''
-        #start = time.time()
         distance = 0.0
 
         #pass to pool
@@ -238,12 +237,9 @@ class Fitness(object):
 
         distance = distance / (WIDTH * HEIGHT)
 
-        #end = time.time()
-        #print end - start
         return distance
 
     def feature_matching(self, img):
-        #start = time.time()
         kp, desc = self.detector.detectAndCompute(img, None)
 
         matches = self.matcher.match(self.desc, desc)
@@ -256,8 +252,6 @@ class Fitness(object):
         if len(matches) != 0:
             distance = distance / len(matches)
 
-        #end = time.time()
-        #print end - start
 
         if distance == 0:
             return sys.maxint
@@ -370,7 +364,6 @@ class HillSteppingDriver(Driver):
             if(fit < 1):
                 return polygons
             polygons = self.step(polygons, fit)
-            #print "leave step"
             iterations += 1
             print iterations
 
@@ -454,6 +447,7 @@ class GeneticAlgorithmDriver(Driver):
             thresholds[i] += thresholds[i - 1]
 
         children = self.pool.map(create_child, [(population, thresholds, self.num_parents) for i in xrange(self.pop_size)])
+        #uncomment line for windows systems, and comment line above
         #children = [create_child((population, thresholds, self.num_parents)) for i in xrange(self.pop_size)]
 
         if THRESH.elitism is not None:
