@@ -16,21 +16,16 @@ WIDTH = 0
 HEIGHT = 0
 
 class Polygon(object):
-    def __init__(self, points=None, red = None, blue = None, green = None, opacity = None):
+    def __init__(self, points=3, red = None, blue = None, green = None, opacity = None):
         self.points = points
-        if points is None:
-            self.points = [None] * 3
+        if type(points)==int:
+            self.points = [None] * points
 
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[0] = [x,y]
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[1] = [x,y]
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[2] = [x,y]
-            self.order_vertices()
+            for i in xrange(points):
+                x = int(random.random() * WIDTH)
+                y = int(random.random() * HEIGHT)
+                self.points[i] = [x,y]
+            self.__order_vertices()
 
         self.red = red
         if red is None:
@@ -48,13 +43,13 @@ class Polygon(object):
         if opacity is None:
             self.opacity = random.random()
 
-    def add_vertex(self):
+    def __add_vertex(self):
         x = int(random.random() * WIDTH)
         y = int(random.random() * HEIGHT)
         self.points.append([x,y])
-        self.order_vertices()
+        self.__order_vertices()
 
-    def order_vertices(self):
+    def __order_vertices(self):
         #calculate center point
         xc = 0.0
         yc = 0.0
@@ -68,40 +63,40 @@ class Polygon(object):
         #sort
         self.points = sorted(self.points, key=lambda p: math.atan2(p[1] - yc, p[0] - xc))
 
-    def remove_vertex(self):
+    def __remove_vertex(self):
         to_remove = int(random.random() * len(self.points))
         self.points.pop(to_remove)
 
-    def change_opacity(self):
+    def __change_opacity(self):
         self.opacity = random.random()
 
-    def change_red(self):
+    def __change_red(self):
         self.red = int(random.random() * 256)
 
-    def change_green(self):
+    def __change_green(self):
         self.green = int(random.random() * 256)
 
-    def change_blue(self):
+    def __change_blue(self):
         self.blue = int(random.random() * 256)
 
     def mutate(self):
         mutation = random.random()
         if(mutation < THRESH.polygon[0]):
-            self.change_opacity()
+            self.__change_opacity()
         elif(mutation < THRESH.polygon[1]):
-            self.change_red()
+            self.__change_red()
         elif(mutation < THRESH.polygon[2]):
-            self.change_green()
+            self.__change_green()
         elif (mutation < THRESH.polygon[3]):
-            self.change_blue()
+            self.__change_blue()
         else:
             if(len(self.points)> 3):
                 if(random.random() < THRESH.remove_point):
-                    self.remove_vertex()
+                    self.__remove_vertex()
                 else:
-                    self.add_vertex()
+                    self.__add_vertex()
             else:
-                self.add_vertex()
+                self.__add_vertex()
 
     def __str__(self):
         poly = {
@@ -148,7 +143,7 @@ class Fitness(object):
 
         self.step = sample
 
-    def euclidean(self, img):
+    def __euclidean(self, img):
         '''assumes img and self.original have the same size'''
         distance = 0.0
 
@@ -162,7 +157,7 @@ class Fitness(object):
 
         return distance
 
-    def feature_matching(self, img):
+    def __feature_matching(self, img):
         kp, desc = self.detector.detectAndCompute(img, None)
 
         matches = self.matcher.match(self.desc, desc)
@@ -183,9 +178,9 @@ class Fitness(object):
     
     def score(self, img):
         if (self.type == "euc"):
-            return self.euclidean(img)
+            return self.__euclidean(img)
         elif (self.type == "feat"):
-            return self.feature_matching(img)
+            return self.__feature_matching(img)
 
 def mutate(plys):
     val = random.random()
@@ -216,7 +211,7 @@ class Driver(object):
         self.iterations = args.iterations
         self.max_poly = 1
 
-    def draw(self, polygons):
+    def __draw(self, polygons):
         img = np.zeros(self.original.shape)
         
         for p in polygons:
@@ -244,17 +239,15 @@ class Driver(object):
 
         person = [None] * num_polys
         for i in xrange(num_polys):
-            poly = Polygon()
             num_points = random.randrange(3, 7)
-            for j in xrange(3, num_points):
-                poly.add_vertex()
+            poly = Polygon(points=num_points)
 
             person[i] = poly
 
         return person
 
     def fitness(self, plys):
-        img = self.draw(plys)
+        img = self.__draw(plys)
         f = self.fit.score(img)
         del img
 
@@ -268,7 +261,7 @@ class HillSteppingDriver(Driver):
         Driver.__init__(self, args)
         self.simulated_annealing = False
 
-    def step(self, polygons, fit):
+    def __step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
         mutate(newpolygons)
 
@@ -287,7 +280,7 @@ class HillSteppingDriver(Driver):
             fit = self.fitness(polygons)
             if(fit < 1):
                 return polygons
-            polygons = self.step(polygons, fit)
+            polygons = self.__step(polygons, fit)
             iterations += 1
             print iterations
 
@@ -352,7 +345,7 @@ class GeneticAlgorithmDriver(Driver):
 
         self.niche_penalty = abs(args.niche)
 
-    def evolve(self, population, pop_fitness):
+    def __evolve(self, population, pop_fitness):
         #niche penalty
         if self.niche_penalty != 0:
             temp = pop_fitness
@@ -415,7 +408,7 @@ class GeneticAlgorithmDriver(Driver):
             if (min(fit) < 1):
                 index = np.argmin(np.array(fit))
                 return population[index]
-            population = self.evolve(population, fit)
+            population = self.__evolve(population, fit)
             #print "leave crossbreed""
             iterations += 1
             print iterations
