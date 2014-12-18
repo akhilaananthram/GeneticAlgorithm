@@ -64,6 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Polygon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Polygon.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
