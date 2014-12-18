@@ -208,7 +208,8 @@ class Driver(object):
         self.num_proc = 3
         self.pool = Pool(self.num_proc)
         self.fit = Fitness(self.original, args.fitness, args.sample, self.pool)
-        self.iterations = args.iterations
+        self.max_iterations = args.iterations
+        self.iterations = 1
         self.max_poly = 1
 
     def __draw(self, polygons):
@@ -257,32 +258,37 @@ class Driver(object):
         return None
 
 class HillSteppingDriver(Driver):
-    def __init__(self, args):
+    def __init__(self, args, sim_an=False):
         Driver.__init__(self, args)
-        self.simulated_annealing = False
+        self.simulated_annealing = sim_an
 
     def __step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
         mutate(newpolygons)
 
-        while(self.fitness(newpolygons) >= fit):
-            newpolygons = copy.deepcopy(polygons)
-            mutate(newpolygons)
+        if self.simulated_annealing and random.random() < (0.5 / self.iterations):
+            while(self.fitness(newpolygons) <= fit):
+                newpolygons = copy.deepcopy(polygons)
+                mutate(newpolygons)
+        else:
+            while(self.fitness(newpolygons) >= fit):
+                newpolygons = copy.deepcopy(polygons)
+                mutate(newpolygons)
         return newpolygons
 
     def run(self):
         polygons = self.random_person()
-        iterations = 0
+        self.iterations = 1
         while True:
-            if self.iterations != None and self.iterations == iterations:
+            if self.max_iterations != None and self.max_iterations < self.iterations:
                 return polygons
 
             fit = self.fitness(polygons)
             if(fit < 1):
                 return polygons
             polygons = self.__step(polygons, fit)
-            iterations += 1
-            print iterations
+            print self.iterations
+            self.iterations += 1
 
 def reservoir_sampling(parent, num_genes):
     genes = [None] * min(len(parent), num_genes)
@@ -397,9 +403,9 @@ class GeneticAlgorithmDriver(Driver):
     def run(self):
         #generate population
         population = [self.random_person() for i in xrange(self.pop_size)]
-        iterations = 0
+        self.iterations = 1
         while True:
-            if self.iterations != None and self.iterations == iterations:
+            if self.max_iterations != None and self.max_iterations < self.iterations:
                 fit = [self.fitness(p) for p in population]
                 index = np.argmin(np.array(fit))
                 return population[index]
@@ -410,12 +416,12 @@ class GeneticAlgorithmDriver(Driver):
                 return population[index]
             population = self.__evolve(population, fit)
             #print "leave crossbreed""
-            iterations += 1
-            print iterations
+            print self.iterations
+            self.iterations += 1
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Genetic Programming: Evolution of Images from Translucent Polygons")
-    parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "genetic"],
+    parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "sim_an", "genetic"],
         help="Type of algorithm to use", default="genetic")
     parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"],
         help="Type of fitness function to use.")
@@ -441,6 +447,8 @@ if __name__=="__main__":
 
     if args.algo == "genetic":
         d = GeneticAlgorithmDriver(args)
+    elif args.algo == "sim_an":
+        d = HillSteppingDriver(args, sim_an=True)
     else:
         d = HillSteppingDriver(args)
 
