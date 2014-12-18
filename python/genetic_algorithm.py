@@ -9,105 +9,23 @@ import time
 import sys
 import json
 
+from thresholds import Thresholds
+
 THRESH = None
 WIDTH = 0
 HEIGHT = 0
 
-class Thresholds(object):
-    def __init__(self, threshold_file, pop_size):
-        #default initiation
-        #POLYGON MUTATION
-        self.opacity = .2
-        self.red = .2
-        self.green = .2
-        self.blue = .2
-        self.points = .2
-        self.remove_point = .5
-        #POPULATION MUTATION
-        self.pop_mutate_poly = .4
-        self.modify_list = .6
-        self.remove = 0.05
-        #EVOLVE
-        self.niche = 0
-        self.mutation = .1
-        self.elitism = None
-        self.add_random = 0
-
-        if threshold_file is not None:
-            #use json to read in dictionary
-            with file(threshold_file) as f:
-                thresholds = json.load(f)
-
-                #POLYGON MUTATION
-                polygon = thresholds.get("polygon", {})
-                self.opacity = polygon.get("opacity", self.opacity)
-                self.red = polygon.get("red", self.red)
-                self.green = polygon.get("green", self.green)
-                self.blue = polygon.get("blue", self.blue)
-                self.points = polygon.get("points", self.points)
-                self.remove_point = polygon.get("remove", self.remove_point)
-
-                #POPULATION MUTATION
-                population = thresholds.get("population", {})
-                self.pop_mutate_poly = population.get("mutate", self.pop_mutate_poly)
-                self.modify_list = population.get("modify", self.modify_list)
-                remove = population.get("remove", self.remove)
-                if 0 <= remove <= 1:
-                    self.remove = remove
-
-                #EVOLVE
-                evolve = thresholds.get("evolve", {})
-
-                self.niche = abs(evolve.get("niche", self.niche))
-                mutation = evolve.get("mutate", self.mutation)
-                if 0 <= mutation <= 1:
-                    self.mutation = mutation
-                
-                self.add_random = evolve.get("random", self.add_random)
-
-                elitism = evolve.get("elitism", self.elitism)
-                #not valid elitism
-                if elitism <= 0 or elitism is None or elitism > pop_size:
-                    self.elitism = None
-                #already proportion
-                elif elitism < 1:
-                    self.elitism = elitism
-                #make into proportion
-                else:
-                    self.elitism = elitism / pop_size
-
-        total = self.opacity + self.red + self.green + self.blue + self.points + self.remove_point
-        self.opacity = self.opacity / total
-        self.red = self.red / total
-        self.green = self.green / total
-        self.blue = self.blue / total
-        self.points = self.points / total
-        self.remove_point = self.remove_point / total
-
-        total = self.pop_mutate_poly + self.modify_list
-        self.pop_mutate_poly = self.pop_mutate_poly / total
-        self.modify_list = self.modify_list / total
-
-        self.polygon = [self.opacity, self.red, self.green, self.blue, self.remove_point]
-        for i in xrange(1, len(self.polygon)):
-            self.polygon[i] += self.polygon[i - 1]
-
 class Polygon(object):
-    def __init__(self, points=None, red = None, blue = None, green = None, opacity = None):
+    def __init__(self, points=3, red = None, blue = None, green = None, opacity = None):
         self.points = points
-        if points is None:
-            self.points = [None] * 3
+        if type(points)==int:
+            self.points = [None] * points
 
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[0] = [x,y]
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[1] = [x,y]
-            x = int(random.random() * WIDTH)
-            y = int(random.random() * HEIGHT)
-            self.points[2] = [x,y]
-            self.order_vertices()
+            for i in xrange(points):
+                x = int(random.random() * WIDTH)
+                y = int(random.random() * HEIGHT)
+                self.points[i] = [x,y]
+            self.__order_vertices()
 
         self.red = red
         if red is None:
@@ -125,13 +43,13 @@ class Polygon(object):
         if opacity is None:
             self.opacity = random.random()
 
-    def add_vertex(self):
+    def __add_vertex(self):
         x = int(random.random() * WIDTH)
         y = int(random.random() * HEIGHT)
         self.points.append([x,y])
-        self.order_vertices()
+        self.__order_vertices()
 
-    def order_vertices(self):
+    def __order_vertices(self):
         #calculate center point
         xc = 0.0
         yc = 0.0
@@ -145,40 +63,40 @@ class Polygon(object):
         #sort
         self.points = sorted(self.points, key=lambda p: math.atan2(p[1] - yc, p[0] - xc))
 
-    def remove_vertex(self):
+    def __remove_vertex(self):
         to_remove = int(random.random() * len(self.points))
         self.points.pop(to_remove)
 
-    def change_opacity(self):
+    def __change_opacity(self):
         self.opacity = random.random()
 
-    def change_red(self):
+    def __change_red(self):
         self.red = int(random.random() * 256)
 
-    def change_green(self):
+    def __change_green(self):
         self.green = int(random.random() * 256)
 
-    def change_blue(self):
+    def __change_blue(self):
         self.blue = int(random.random() * 256)
 
     def mutate(self):
         mutation = random.random()
         if(mutation < THRESH.polygon[0]):
-            self.change_opacity()
+            self.__change_opacity()
         elif(mutation < THRESH.polygon[1]):
-            self.change_red()
+            self.__change_red()
         elif(mutation < THRESH.polygon[2]):
-            self.change_green()
+            self.__change_green()
         elif (mutation < THRESH.polygon[3]):
-            self.change_blue()
+            self.__change_blue()
         else:
             if(len(self.points)> 3):
                 if(random.random() < THRESH.remove_point):
-                    self.remove_vertex()
+                    self.__remove_vertex()
                 else:
-                    self.add_vertex()
+                    self.__add_vertex()
             else:
-                self.add_vertex()
+                self.__add_vertex()
 
     def __str__(self):
         poly = {
@@ -225,7 +143,7 @@ class Fitness(object):
 
         self.step = sample
 
-    def euclidean(self, img):
+    def __euclidean(self, img):
         '''assumes img and self.original have the same size'''
         distance = 0.0
 
@@ -239,7 +157,7 @@ class Fitness(object):
 
         return distance
 
-    def feature_matching(self, img):
+    def __feature_matching(self, img):
         kp, desc = self.detector.detectAndCompute(img, None)
 
         matches = self.matcher.match(self.desc, desc)
@@ -260,9 +178,9 @@ class Fitness(object):
     
     def score(self, img):
         if (self.type == "euc"):
-            return self.euclidean(img)
+            return self.__euclidean(img)
         elif (self.type == "feat"):
-            return self.feature_matching(img)
+            return self.__feature_matching(img)
 
 def mutate(plys):
     val = random.random()
@@ -290,10 +208,11 @@ class Driver(object):
         self.num_proc = 3
         self.pool = Pool(self.num_proc)
         self.fit = Fitness(self.original, args.fitness, args.sample, self.pool)
-        self.iterations = args.iterations
+        self.max_iterations = args.iterations
+        self.iterations = 1
         self.max_poly = 1
 
-    def draw(self, polygons):
+    def __draw(self, polygons):
         img = np.zeros(self.original.shape)
         
         for p in polygons:
@@ -321,17 +240,15 @@ class Driver(object):
 
         person = [None] * num_polys
         for i in xrange(num_polys):
-            poly = Polygon()
             num_points = random.randrange(3, 7)
-            for j in xrange(3, num_points):
-                poly.add_vertex()
+            poly = Polygon(points=num_points)
 
             person[i] = poly
 
         return person
 
     def fitness(self, plys):
-        img = self.draw(plys)
+        img = self.__draw(plys)
         f = self.fit.score(img)
         del img
 
@@ -341,31 +258,37 @@ class Driver(object):
         return None
 
 class HillSteppingDriver(Driver):
-    def __init__(self, args):
+    def __init__(self, args, sim_an=False):
         Driver.__init__(self, args)
+        self.simulated_annealing = sim_an
 
-    def step(self, polygons, fit):
+    def __step(self, polygons, fit):
         newpolygons = copy.deepcopy(polygons)
         mutate(newpolygons)
 
-        while(self.fitness(newpolygons) >= fit):
-            newpolygons = copy.deepcopy(polygons)
-            mutate(newpolygons)
+        if self.simulated_annealing and random.random() < (0.5 / self.iterations):
+            while(self.fitness(newpolygons) <= fit):
+                newpolygons = copy.deepcopy(polygons)
+                mutate(newpolygons)
+        else:
+            while(self.fitness(newpolygons) >= fit):
+                newpolygons = copy.deepcopy(polygons)
+                mutate(newpolygons)
         return newpolygons
 
     def run(self):
         polygons = self.random_person()
-        iterations = 0
+        self.iterations = 1
         while True:
-            if self.iterations != None and self.iterations == iterations:
+            if self.max_iterations != None and self.max_iterations < self.iterations:
                 return polygons
 
             fit = self.fitness(polygons)
             if(fit < 1):
                 return polygons
-            polygons = self.step(polygons, fit)
-            iterations += 1
-            print iterations
+            polygons = self.__step(polygons, fit)
+            print self.iterations
+            self.iterations += 1
 
 def reservoir_sampling(parent, num_genes):
     genes = [None] * min(len(parent), num_genes)
@@ -428,7 +351,7 @@ class GeneticAlgorithmDriver(Driver):
 
         self.niche_penalty = abs(args.niche)
 
-    def evolve(self, population, pop_fitness):
+    def __evolve(self, population, pop_fitness):
         #niche penalty
         if self.niche_penalty != 0:
             temp = pop_fitness
@@ -480,9 +403,9 @@ class GeneticAlgorithmDriver(Driver):
     def run(self):
         #generate population
         population = [self.random_person() for i in xrange(self.pop_size)]
-        iterations = 0
+        self.iterations = 1
         while True:
-            if self.iterations != None and self.iterations == iterations:
+            if self.max_iterations != None and self.max_iterations < self.iterations:
                 fit = [self.fitness(p) for p in population]
                 index = np.argmin(np.array(fit))
                 return population[index]
@@ -491,14 +414,14 @@ class GeneticAlgorithmDriver(Driver):
             if (min(fit) < 1):
                 index = np.argmin(np.array(fit))
                 return population[index]
-            population = self.evolve(population, fit)
+            population = self.__evolve(population, fit)
             #print "leave crossbreed""
-            iterations += 1
-            print iterations
+            print self.iterations
+            self.iterations += 1
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Genetic Programming: Evolution of Images from Translucent Polygons")
-    parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "genetic"],
+    parser.add_argument("--algorithm", dest="algo", type=str, choices=["hill", "sim_an", "genetic"],
         help="Type of algorithm to use", default="genetic")
     parser.add_argument("--fitness", dest="fitness", default="euc", choices=["euc", "feat"],
         help="Type of fitness function to use.")
@@ -524,6 +447,8 @@ if __name__=="__main__":
 
     if args.algo == "genetic":
         d = GeneticAlgorithmDriver(args)
+    elif args.algo == "sim_an":
+        d = HillSteppingDriver(args, sim_an=True)
     else:
         d = HillSteppingDriver(args)
 
