@@ -3,3 +3,6 @@
 *.pyc
 .DS_Store
 *.swp
+*.opensdf
+*.sdf
+*.suo
