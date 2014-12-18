@@ -14,7 +14,7 @@ Fitness::score(Mat img) {
   }
 }
 
-Fitness::euclidean(Mat img) {
+float Fitness::euclidean(Mat img) {
   float distance = 0.0;
   for(int i=0; i<img.rows; i+=sample){
     for(int j=0; j<img.cols; j+=sample){
