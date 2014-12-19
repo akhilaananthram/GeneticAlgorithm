@@ -1,7 +1,6 @@
 #include "Polygon.h"
 #include <algorithm>
 #include <math.h>
-#include <stdlib.h>
 
 #define WIDTH 100
 #define HEIGHT 100
