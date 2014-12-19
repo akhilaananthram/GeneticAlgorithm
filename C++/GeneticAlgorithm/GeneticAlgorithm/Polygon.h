@@ -3,13 +3,14 @@
 
 class Polygon {
 public:
-	Polygon(int start_points = 3, int r = -1, int b = -1, int g = -1, float o = -1.0);
+	Polygon(int start_points = 3);
 	void mutate();
-
-private:
 	std::vector<Point> points;
 	int red, blue, green;
 	float opacity;
+
+private:
+	Point center;
 	//these functions add/remove a random point
 	void add_vertex();
 	void remove_vertex();
