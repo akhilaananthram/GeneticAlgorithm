@@ -11,6 +11,7 @@ extern int HEIGHT;
 //todo figure out where these should go
 
 using namespace cv;
+using namespace std;
 
 class SortHelper {
 public:

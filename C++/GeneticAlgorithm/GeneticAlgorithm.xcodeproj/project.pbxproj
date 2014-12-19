@@ -10,8 +10,9 @@
 		E91B05631A44C55200606635 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B05621A44C55200606635 /* main.cpp */; };
 		E91B056B1A44C6B000606635 /* Fitness.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B05691A44C6B000606635 /* Fitness.cpp */; };
 		E91B056E1A44C6BA00606635 /* LocalSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B056C1A44C6BA00606635 /* LocalSearch.cpp */; };
-		E91B05731A44C6CE00606635 /* Point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B056F1A44C6CE00606635 /* Point.cpp */; };
 		E91B05741A44C6CE00606635 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B05711A44C6CE00606635 /* Polygon.cpp */; };
+		E91B057D1A44E0D200606635 /* libopencv_core.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */; };
+		E91B057F1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,10 +34,10 @@
 		E91B056A1A44C6B000606635 /* Fitness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Fitness.h; sourceTree = "<group>"; };
 		E91B056C1A44C6BA00606635 /* LocalSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LocalSearch.cpp; sourceTree = "<group>"; };
 		E91B056D1A44C6BA00606635 /* LocalSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalSearch.h; sourceTree = "<group>"; };
-		E91B056F1A44C6CE00606635 /* Point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Point.cpp; sourceTree = "<group>"; };
-		E91B05701A44C6CE00606635 /* Point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
 		E91B05711A44C6CE00606635 /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
 		E91B05721A44C6CE00606635 /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
+		E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.9.dylib; path = ../../../../../../../../../anaconda/lib/libopencv_core.2.4.9.dylib; sourceTree = "<group>"; };
+		E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.9.dylib; path = ../../../../../../../../../anaconda/lib/libopencv_highgui.2.4.9.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +45,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E91B057F1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib in Frameworks */,
+				E91B057D1A44E0D200606635 /* libopencv_core.2.4.9.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +56,7 @@
 		E91B05561A44C55200606635 = {
 			isa = PBXGroup;
 			children = (
+				E91B057B1A44E0AC00606635 /* OpenCV Frameworks */,
 				E91B05611A44C55200606635 /* GeneticAlgorithm */,
 				E91B05601A44C55200606635 /* Products */,
 			);
@@ -69,8 +73,6 @@
 		E91B05611A44C55200606635 /* GeneticAlgorithm */ = {
 			isa = PBXGroup;
 			children = (
-				E91B056F1A44C6CE00606635 /* Point.cpp */,
-				E91B05701A44C6CE00606635 /* Point.h */,
 				E91B05711A44C6CE00606635 /* Polygon.cpp */,
 				E91B05721A44C6CE00606635 /* Polygon.h */,
 				E91B056C1A44C6BA00606635 /* LocalSearch.cpp */,
@@ -80,6 +82,15 @@
 				E91B05621A44C55200606635 /* main.cpp */,
 			);
 			path = GeneticAlgorithm;
+			sourceTree = "<group>";
+		};
+		E91B057B1A44E0AC00606635 /* OpenCV Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */,
+				E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */,
+			);
+			name = "OpenCV Frameworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +149,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E91B05731A44C6CE00606635 /* Point.cpp in Sources */,
 				E91B05741A44C6CE00606635 /* Polygon.cpp in Sources */,
 				E91B056B1A44C6B000606635 /* Fitness.cpp in Sources */,
 				E91B05631A44C55200606635 /* main.cpp in Sources */,
@@ -226,6 +236,15 @@
 		E91B05671A44C55200606635 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/anaconda/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/anaconda/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -233,6 +252,15 @@
 		E91B05681A44C55200606635 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/anaconda/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/anaconda/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -256,6 +284,7 @@
 				E91B05681A44C55200606635 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
