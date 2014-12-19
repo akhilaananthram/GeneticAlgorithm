@@ -1,12 +1,14 @@
 #include "Polygon.h"
 #include <algorithm>
 #include <math.h>
+#include <stdlib.h>
 
 #define WIDTH 100
 #define HEIGHT 100
 //todo figure out where these should go
 
 using namespace cv;
+using namespace std;
 
 class SortHelper {
 public:
