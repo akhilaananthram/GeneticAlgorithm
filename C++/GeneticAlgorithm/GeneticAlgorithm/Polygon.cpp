@@ -1,6 +1,13 @@
 #include "Polygon.h"
 #include <algorithm>
 #include <math.h>
+
+#define WIDTH 100
+#define HEIGHT 100
+//todo figure out where these should go
+
+using namespace cv;
+
 class SortHelper {
 public:
 	Point center;
@@ -10,7 +17,7 @@ Polygon::Polygon(int start_points)
 {
 		center = Point(0, 0);
 		for (int i = 0; i < start_points; i++) {
-			Point p = Point();
+			Point p = Point(rand() % WIDTH, rand() % HEIGHT);
 			points.push_back(p);
 			center.x += p.x;
 			center.y += p.y;
@@ -51,7 +58,7 @@ void Polygon::remove_vertex() {
 	points.erase(points.begin() + r);
 }
 void Polygon::add_vertex() {
-	Point p = Point();
+	Point p = Point(rand() % WIDTH, rand() % HEIGHT);
 	center.x *= points.size();
 	center.y *= points.size();
 	center.x += p.x;

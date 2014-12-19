@@ -7,13 +7,13 @@ using namespace cv;
 class LocalSearch {
 public:
   LocalSearch(Mat original, Fitness f, int max_iterations);
-  virtual void run();
+//  virtual void run();
 
 private:
-  Mat draw(Polygon[] plys);
-  float fitness(Polygon[] plys);
-  Polygon[] randomPerson();
+  Mat draw(Polygon plys[]);
+  float fitness(Polygon plys[]);
+  std::vector<Polygon>* randomPerson();
   Mat original;
   Fitness fit;
   int max_iterations;
-}
+};

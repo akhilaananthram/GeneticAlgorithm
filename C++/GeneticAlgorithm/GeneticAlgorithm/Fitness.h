@@ -3,14 +3,16 @@
 
 using namespace cv;
 
+#define EUC 1
+
 class Fitness {
 public:
-  Fitness(Mat original, String type="euc", int sample=1):
-  float score(Mat img);
+	Fitness(Mat original, int type = EUC, int sample = 1);
+	float score(Mat img);
 
 private:
   float euclidean(Mat img);
   Mat original;
-  String type;
+  int type;
   int sample;
 };

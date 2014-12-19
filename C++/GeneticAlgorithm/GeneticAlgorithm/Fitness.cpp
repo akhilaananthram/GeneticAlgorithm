@@ -1,16 +1,18 @@
 #include "Fitness.h"
 #include <math.h>
 
-Fitness::Fitness(Mat original, String type, int sample):
-original(original);
-type(type);
-sample(sample);
-{}
+Fitness::Fitness(Mat original, int type, int sample) :
+original(original),
+type(type),
+sample(sample)
+{};
 
-Fitness::score(Mat img) {
+float Fitness::score(Mat img) {
   switch(type){
-    case "euc":
+    case EUC:
         return euclidean(img);
+	default:
+		throw "Unknown fitness type!";
   }
 }
 
@@ -21,7 +23,7 @@ float Fitness::euclidean(Mat img) {
       Vec3b source = original.at<Vec3b>(i,j);
       Vec3b data = img.at<Vec3b>(i,j);
 
-      distance += math::sqrt(source[0] * data[0] + source[1] * data[1] + source[2] * data[2]);
+      distance += sqrt(source[0] * data[0] + source[1] * data[1] + source[2] * data[2]);
     }
   }
 

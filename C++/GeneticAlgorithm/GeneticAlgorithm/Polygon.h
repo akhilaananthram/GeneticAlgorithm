@@ -1,5 +1,7 @@
-#include "Point.h"
 #include <vector>
+#include "opencv2/core/core.hpp"
+
+using namespace cv;
 
 class Polygon {
 public:
