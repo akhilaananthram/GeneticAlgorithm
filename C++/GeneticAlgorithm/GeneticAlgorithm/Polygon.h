@@ -1,3 +1,6 @@
+#ifndef __Polygon__Polygon__
+#define __Polygon__Polygon__
+
 #include <vector>
 #include "opencv2/core/core.hpp"
 
@@ -22,3 +25,5 @@ private:
 	void change_green();
 	void change_opacity();
 };
+
+#endif /* defined(__Polygon__Polygon__) */

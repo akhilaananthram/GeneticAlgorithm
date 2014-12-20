@@ -120,11 +120,11 @@ vector<Person *>* GeneticAlgorithm::evolve(vector<Person *>* population) {
     //TODO: elitism
     if (t.evolve_properties.elitism > 0) {
         //sort parents
-        sort(population->begin(), population->end(), by_fitness());
+        sort(population->begin(), population->end());
         int num_parents_to_save = (int)num_parents * t.evolve_properties.elitism;
         
         //sort children
-        sort(children->begin(), children->end(), by_fitness());
+        sort(children->begin(), children->end());
         int num_child_to_save = population_size - num_parents_to_save;
         
         //get rid of children we aren't keeping

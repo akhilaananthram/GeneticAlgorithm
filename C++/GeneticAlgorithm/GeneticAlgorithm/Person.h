@@ -14,9 +14,6 @@
 struct Person {
     vector<Polygon> * plys;
     float fit;
-};
-
-struct by_fitness {
     bool operator()(Person const &a, Person const &b) {
         return a.fit < b.fit;
     }

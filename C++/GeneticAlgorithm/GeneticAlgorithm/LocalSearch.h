@@ -1,3 +1,6 @@
+#ifndef __LocalSearch__LocalSearch__
+#define __LocalSearch__LocalSearch__
+
 #include <opencv2/opencv.hpp>
 #include "Fitness.h"
 #include "Polygon.h"
@@ -18,3 +21,5 @@ private:
   Mat draw(vector<Polygon>* plys);
   Fitness fit;
 };
+
+#endif /* defined(__LocalSearch__LocalSearch__) */

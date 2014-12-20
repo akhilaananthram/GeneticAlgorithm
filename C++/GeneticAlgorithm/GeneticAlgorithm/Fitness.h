@@ -1,3 +1,6 @@
+#ifndef __Fitness__Fitness__
+#define __Fitness__Fitness__
+
 #include <opencv2/opencv.hpp>
 #include <string>
 
@@ -16,3 +19,5 @@ private:
   int type;
   int sample;
 };
+
+#endif /* defined(__Fitness__Fitness__) */

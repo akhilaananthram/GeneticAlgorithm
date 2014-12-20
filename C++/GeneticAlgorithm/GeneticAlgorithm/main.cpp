@@ -1,6 +1,8 @@
 #include <iostream>
-#include "Polygon.h"
 #include "Threshold.h"
+#include "Fitness.h"
+#include "GeneticAlgorithm.h"
+#include "HillStepper.h"
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/stringbuffer.h"
@@ -11,6 +13,7 @@
 #define NUM_EVOLVE_PROPERTIES 4
 
 using namespace rapidjson;
+using namespace cv;
 
 int WIDTH = 100, HEIGHT = 100;
 struct Threshold t;
@@ -60,7 +63,9 @@ void parse_threshold(const char* threshold_file) {
 int main(int argc, const char * argv[]) {
 	
 	//parse_threshold("defaults.json");
-	Polygon p = Polygon();
+    Mat original = imread("../../images/mona2.jpg", CV_LOAD_IMAGE_COLOR);
+    Fitness f = Fitness(original);
+    
     std::cout << "Hello, World!\n";
 	//system("PAUSE");
     return 0;
