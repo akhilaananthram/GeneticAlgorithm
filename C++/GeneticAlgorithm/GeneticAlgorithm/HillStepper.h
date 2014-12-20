@@ -5,5 +5,6 @@ public:
 	std::vector<Polygon>* run();
 private:
 	bool sim_an;
+	int iters;
 	std::vector<Polygon>* step(std::vector<Polygon>* polygons, float fit);
 };

@@ -7,7 +7,7 @@ sim_an(sim_an)
 
 std::vector<Polygon>* HillStepper::run() {
 	std::vector<Polygon>* polys = randomPerson();
-	int iters = 1;
+	iters = 1;
 	while (true) {
 		if (max_iterations > 0 && iters == max_iterations) {
 			return polys;
@@ -23,5 +23,16 @@ std::vector<Polygon>* HillStepper::run() {
 }
 
 std::vector<Polygon>* HillStepper::step(std::vector<Polygon>* polys, float fit) {
+	mutate(polys);
 
+	if (sim_an && ((float)rand()) / RAND_MAX < (.5 / iters)) {
+		while (fitness(polys) <= fit) {
+			mutate(polys);
+		}
+	} else {
+		while (fitness(polys) >= fit) {
+			mutate(polys);
+		}
+	}
+	return polys;
 }

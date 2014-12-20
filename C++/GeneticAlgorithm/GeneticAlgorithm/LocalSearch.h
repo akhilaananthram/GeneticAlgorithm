@@ -12,6 +12,7 @@ public:
   std::vector<Polygon>* randomPerson();
   float fitness(vector<Polygon>* plys);
   int max_iterations;
+  void mutate(std::vector<Polygon>* polys);
 
 private:
   Mat draw(vector<Polygon>* plys);
