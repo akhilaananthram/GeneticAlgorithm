@@ -61,7 +61,11 @@ vector<Polygon>* GeneticAlgorithm::create_child(vector<Polygon>* population[], f
         vector<Polygon> * parent = population[(* it)];
         int num_genes = min((int)parent->size(), (int)num_from_parent);
         vector<Polygon>* genes = reservoir_sampling(parent, num_genes);
-        //TODO: deep copy genes to child
+        //deep copy genes to child
+        vector<Polygon> copy = *genes;
+        for(vector<Polygon>::iterator it=copy.begin(); it!=copy.end();it++) {
+            child->push_back((*it));
+        }
     }
     
     float m = ((float)rand()) / RAND_MAX;
