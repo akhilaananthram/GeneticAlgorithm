@@ -10,3 +10,4 @@
 *.ps
 Debug
 *.user
+/C++/GeneticAlgorithm/GeneticAlgorithm.xcodeproj/project.xcworkspace/xcuserdata
