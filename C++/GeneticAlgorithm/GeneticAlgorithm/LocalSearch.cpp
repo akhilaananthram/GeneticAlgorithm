@@ -45,6 +45,8 @@ Mat LocalSearch::draw(vector<Polygon> * plys) {
           }
       }
   }
+
+  imwrite("../../images/temp.png", img);
     
   return img;
 }
