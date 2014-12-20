@@ -12,8 +12,8 @@ public:
 
 private:
     vector<Polygon>* reservoir_sampling(vector<Polygon>* parent, int num_genes);
-    vector<Polygon>* create_child(vector<Polygon>* population[], float pop_thresholds[]);
-    vector<Polygon>** evolve(vector<Polygon>* population[], float pop_fitness[]);
+    vector<Polygon>* create_child(vector<vector<Polygon> *>* population, float pop_thresholds[]);
+    vector<vector<Polygon> *>* evolve(vector<vector<Polygon> *>* population, float pop_fitness[]);
     int population_size;
     int num_parents;
     float niche_penalty;
