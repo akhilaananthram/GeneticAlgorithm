@@ -45,6 +45,7 @@
 		E952D0811A45300C00B13515 /* HillStepper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HillStepper.cpp; sourceTree = "<group>"; };
 		E952D0821A45300C00B13515 /* HillStepper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HillStepper.h; sourceTree = "<group>"; };
 		E952D0841A45302300B13515 /* Threshold.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Threshold.h; sourceTree = "<group>"; };
+		E99825051A460465008B7969 /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +92,7 @@
 				E91B05691A44C6B000606635 /* Fitness.cpp */,
 				E91B056A1A44C6B000606635 /* Fitness.h */,
 				E952D0841A45302300B13515 /* Threshold.h */,
+				E99825051A460465008B7969 /* Person.h */,
 				E91B05621A44C55200606635 /* main.cpp */,
 			);
 			path = GeneticAlgorithm;

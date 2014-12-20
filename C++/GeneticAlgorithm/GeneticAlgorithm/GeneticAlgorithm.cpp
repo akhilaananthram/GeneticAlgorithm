@@ -28,7 +28,7 @@ vector<Polygon>* GeneticAlgorithm::reservoir_sampling(vector<Polygon>* parent, i
     return genes;
 }
 
-vector<Polygon>* GeneticAlgorithm::create_child(vector<vector<Polygon> *>* population, float pop_thresholds[]) {
+vector<Polygon>* GeneticAlgorithm::create_child(vector<Person *>* population, float pop_thresholds[]) {
     vector<Polygon> * child = new vector<Polygon>();
     
     set<int> * parent_indices = new set<int>();
@@ -51,14 +51,14 @@ vector<Polygon>* GeneticAlgorithm::create_child(vector<vector<Polygon> *>* popul
     
     int num_from_parent = 0;
     for (set<int>::iterator it=parent_indices->begin(); it!=parent_indices->end(); it++) {
-        vector<Polygon> * parent = population->at(* it);
+        vector<Polygon> * parent = population->at(* it)->plys;
         num_from_parent += parent->size();
     }
     
     num_from_parent /= num_parents;
     
     for (set<int>::iterator it=parent_indices->begin(); it!=parent_indices->end(); it++) {
-        vector<Polygon> * parent = population->at(* it);
+        vector<Polygon> * parent = population->at(* it)->plys;
         int num_genes = min((int)parent->size(), (int)num_from_parent);
         vector<Polygon>* genes = reservoir_sampling(parent, num_genes);
         //deep copy genes to child
@@ -76,17 +76,22 @@ vector<Polygon>* GeneticAlgorithm::create_child(vector<vector<Polygon> *>* popul
     return child;
 }
 
-vector<vector<Polygon> *>* GeneticAlgorithm::evolve(vector<vector<Polygon> *>* population, float pop_fitness[]) {
+vector<Person *>* GeneticAlgorithm::evolve(vector<Person *>* population) {
     //niche penalty
+    float pop_fitness[population_size];
     if (niche_penalty !=0) {
-        float * temp = pop_fitness;
         for (int i=0; i<population_size; i++) {
             for (int j=0; j<population_size; j++) {
-                if(abs(temp[i] - temp[j]) < t.evolve_properties.niche) {
-                    pop_fitness[i] = max((float)0, (float)(temp[i] - niche_penalty));
-                    pop_fitness[j] = max((float)0, (float)(temp[j] - niche_penalty));
+                if(abs(population->at(i)->fit - population->at(j)->fit) < t.evolve_properties.niche) {
+                    pop_fitness[i] = max((float)0, (float)(population->at(i)->fit - niche_penalty));
+                    pop_fitness[j] = max((float)0, (float)(population->at(j)->fit - niche_penalty));
                 }
             }
+        }
+    }
+    else {
+        for (int i=0; i<population_size; i++) {
+            pop_fitness[i] = population->at(i)->fit;
         }
     }
     
@@ -103,35 +108,63 @@ vector<vector<Polygon> *>* GeneticAlgorithm::evolve(vector<vector<Polygon> *>* p
         }
     }
     
-    vector<vector<Polygon> *>* children = new vector<vector<Polygon> *>();
+    vector<Person *>* children = new vector<Person *>();
     while (children->size() < population_size) {
-        children->push_back(create_child(population, pop_thresholds));
+        vector<Polygon> * plys = create_child(population, pop_thresholds);
+        Person p = Person();
+        p.plys = plys;
+        p.fit = fitness(plys);
+        children->push_back(&p);
     }
     
     //TODO: elitism
     if (t.evolve_properties.elitism > 0) {
-        int num_parents_to_save = (int)num_parents * t.evolve_properties.elitism;
         //sort parents
+        sort(population->begin(), population->end(), by_fitness());
+        int num_parents_to_save = (int)num_parents * t.evolve_properties.elitism;
         
         //sort children
+        sort(children->begin(), children->end(), by_fitness());
+        int num_child_to_save = population_size - num_parents_to_save;
+        
+        //get rid of children we aren't keeping
+        while (children->size() > num_child_to_save) {
+            children->pop_back();
+        }
+        
+        for (int i=0; i<num_parents_to_save; i++) {
+            children->push_back(population->at(i));
+        }
     }
     
     //random person
     if (t.evolve_properties.random) {
         int index = rand() % population_size;
-        children->at(index) = randomPerson();
+        vector<Polygon> * plys = randomPerson();
+        Person p = Person();
+        p.plys = plys;
+        p.fit = fitness(plys);
+        children->at(index) = &p;
     }
     
     return children;
 }
 
 std::vector<Polygon>* GeneticAlgorithm::run() {
-    vector<vector<Polygon> *>* population = new vector<vector<Polygon> *>();
+    vector<Person *>* population = new vector<Person *>();
+    while (population->size()<population_size) {
+        vector<Polygon> * plys = randomPerson();
+        Person p = Person();
+        p.plys = plys;
+        p.fit = fitness(plys);
+        population->push_back(&p);
+    }
+    
     int iters = 1;
     while (true) {
         float pop_fitness[population_size];
         for (int i=0; i<population_size; i++) {
-            pop_fitness[i] = fitness(population->at(i));
+            pop_fitness[i] = population->at(i)->fit;
         }
         
         int index = -1;
@@ -144,14 +177,14 @@ std::vector<Polygon>* GeneticAlgorithm::run() {
         }
         
         if (max_iterations > 0 && iters == max_iterations) {
-            return population->at(index);
+            return population->at(index)->plys;
         }
         
         if (min_fit < 1) {
-            return population->at(index);
+            return population->at(index)->plys;
         }
         
-        population = evolve(population, pop_fitness);
+        population = evolve(population);
         
         iters++;
     }
