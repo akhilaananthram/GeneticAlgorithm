@@ -1,7 +1,7 @@
 #include "HillStepper.h"
 
-HillStepper::HillStepper(Mat original, Fitness f, int max_iterations, bool sim_an) :
-LocalSearch(original, f, max_iterations),
+HillStepper::HillStepper(Fitness f, int max_iterations, bool sim_an) :
+LocalSearch(f, max_iterations),
 sim_an(sim_an)
 {};
 
