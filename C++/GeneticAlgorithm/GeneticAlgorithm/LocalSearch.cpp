@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "LocalSearch.h"
+#include "Threshold.h"
 
 extern int WIDTH;
 extern int HEIGHT;
@@ -63,4 +64,18 @@ std::vector<Polygon>* LocalSearch::randomPerson() {
   }
     
   return person;
+}
+
+void LocalSearch::mutate(std::vector<Polygon>* polys) {
+	if (polys->size() == 0) {
+		polys->push_back(Polygon());
+	} else if (((float)rand()) / RAND_MAX < t.population_properties.mutate) {
+		int ind = rand() % polys->size();
+		polys->at(ind).mutate();
+	} else if (((float)rand()) / RAND_MAX < t.population_properties.remove){
+		int ind = rand() % polys->size();
+		polys->erase(polys->begin() + ind);
+	} else {
+		polys->push_back(Polygon());
+	}
 }
