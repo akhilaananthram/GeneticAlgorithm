@@ -375,7 +375,7 @@ class GeneticAlgorithmDriver(Driver):
 
         if THRESH.elitism is not None:
             #get (self.elitism * self.pop_size) best parents
-            population, probabilities = zip(*sorted(zip(population, pop_fitness), key=lambda p:p[1], reverse=True))
+            population, probabilities = zip(*sorted(zip(population, pop_fitness), key=lambda p:p[1]))
 
             num_parents = int(THRESH.elitism * self.pop_size)
             lasting_parents = population[:num_parents]
@@ -383,7 +383,7 @@ class GeneticAlgorithmDriver(Driver):
 
             #get ((1 - self.elitism) * self.pop_size) best children
             fitness = [self.fitness(c) for c in children]
-            children, fitness = zip(*sorted(zip(children, fitness), key=lambda c:c[1], reverse=True))
+            children, fitness = zip(*sorted(zip(children, fitness), key=lambda c:c[1]))
             lasting_children = children[:(self.pop_size - num_parents)]
             del children[(self.pop_size - num_parents):]
 
@@ -405,12 +405,11 @@ class GeneticAlgorithmDriver(Driver):
         population = [self.random_person() for i in xrange(self.pop_size)]
         self.iterations = 1
         while True:
+            fit = [self.fitness(p) for p in population]
             if self.max_iterations != None and self.max_iterations < self.iterations:
-                fit = [self.fitness(p) for p in population]
                 index = np.argmin(np.array(fit))
                 return population[index]
 
-            fit = [self.fitness(p) for p in population]
             if (min(fit) < 1):
                 index = np.argmin(np.array(fit))
                 return population[index]

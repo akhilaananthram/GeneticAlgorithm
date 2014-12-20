@@ -110,7 +110,10 @@ vector<vector<Polygon> *>* GeneticAlgorithm::evolve(vector<vector<Polygon> *>* p
     
     //TODO: elitism
     if (t.evolve_properties.elitism > 0) {
+        int num_parents_to_save = (int)num_parents * t.evolve_properties.elitism;
+        //sort parents
         
+        //sort children
     }
     
     //random person
@@ -122,8 +125,34 @@ vector<vector<Polygon> *>* GeneticAlgorithm::evolve(vector<vector<Polygon> *>* p
     return children;
 }
 
-std::vector<Polygon>* LocalSearch::run() {
-    vector<Polygon> * best;
-    
-    return best;
+std::vector<Polygon>* GeneticAlgorithm::run() {
+    vector<vector<Polygon> *>* population = new vector<vector<Polygon> *>();
+    int iters = 1;
+    while (true) {
+        float pop_fitness[population_size];
+        for (int i=0; i<population_size; i++) {
+            pop_fitness[i] = fitness(population->at(i));
+        }
+        
+        int index = -1;
+        float min_fit = 0;
+        for (int i=0; i<population_size; i++) {
+            if (pop_fitness[i] < min_fit || index==-1) {
+                index = i;
+                min_fit = pop_fitness[i];
+            }
+        }
+        
+        if (max_iterations > 0 && iters == max_iterations) {
+            return population->at(index);
+        }
+        
+        if (min_fit < 1) {
+            return population->at(index);
+        }
+        
+        population = evolve(population, pop_fitness);
+        
+        iters++;
+    }
 }

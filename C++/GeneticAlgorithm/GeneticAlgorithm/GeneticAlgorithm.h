@@ -9,6 +9,7 @@ using namespace std;
 class GeneticAlgorithm : public LocalSearch {
 public:
     GeneticAlgorithm(Fitness f, int max_iterations, int population_size, int parents, float niche_penalty);
+    vector<Polygon>* run();
 
 private:
     vector<Polygon>* reservoir_sampling(vector<Polygon>* parent, int num_genes);
