@@ -59,7 +59,7 @@ vector<Polygon>* GeneticAlgorithm::create_child(vector<Polygon>* population[], f
     
     for (set<int>::iterator it=parent_indices->begin(); it!=parent_indices->end(); it++) {
         vector<Polygon> * parent = population[(* it)];
-        int num_genes = std::min(parent->size(), num_from_parent);
+        int num_genes = min((int)parent->size(), (int)num_from_parent);
         vector<Polygon>* genes = reservoir_sampling(parent, num_genes);
         //TODO: deep copy genes to child
     }
