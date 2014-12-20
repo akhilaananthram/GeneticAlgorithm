@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Fitness.h" />
+    <ClInclude Include="GeneticAlgorithm.h" />
     <ClInclude Include="HillStepper.h" />
     <ClInclude Include="LocalSearch.h" />
     <ClInclude Include="Polygon.h" />
@@ -130,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fitness.cpp" />
+    <ClCompile Include="GeneticAlgorithm.cpp" />
     <ClCompile Include="HillStepper.cpp" />
     <ClCompile Include="LocalSearch.cpp" />
     <ClCompile Include="main.cpp" />
