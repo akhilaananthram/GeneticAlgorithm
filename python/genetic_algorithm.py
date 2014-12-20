@@ -299,7 +299,7 @@ def reservoir_sampling(parent, num_genes):
     for i in xrange(len(genes), len(parent)):
         j = random.randrange(0, i)
 
-        if j <= len(genes):
+        if j < len(genes):
             genes[j] = parent[i]
 
     return genes

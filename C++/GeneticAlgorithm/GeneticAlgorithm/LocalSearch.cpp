@@ -1,19 +1,22 @@
 #include <stdlib.h>
 #include "LocalSearch.h"
 
-LocalSearch::LocalSearch(Mat original, Fitness f, int max_iterations) :
-original(original),
+extern int WIDTH;
+extern int HEIGHT;
+extern struct Threshold t;
+
+LocalSearch::LocalSearch(Fitness f, int max_iterations) :
 fit(f),
 max_iterations(max_iterations)
 {};
 
 Mat LocalSearch::draw(vector<Polygon> * plys) {
-  Mat img = Mat::zeros(original.rows, original.cols, CV_64FC3);
+  Mat img = Mat::zeros(WIDTH, HEIGHT, CV_64FC3);
   
   //add all the polygons to the image
   for (vector<Polygon>::iterator it=plys->begin(); it!=plys->end(); it++) {
       //create mask
-      Mat mask = Mat::zeros(original.rows, original.cols, CV_64FC1);
+      Mat mask = Mat::zeros(WIDTH, HEIGHT, CV_64FC1);
       Polygon p = (* it);
       int num_points = (int) p.points.size();
       Point * polygon_points = new Point[num_points];
@@ -28,8 +31,8 @@ Mat LocalSearch::draw(vector<Polygon> * plys) {
       delete polygon_points;
       
       //factor in opacity
-      for (i=0; i<original.rows;i++) {
-          for (int j=0; j<original.cols; j++) {
+      for (i=0; i<WIDTH;i++) {
+          for (int j=0; j<HEIGHT; j++) {
               if (mask.at<bool>(i,j)){
                   int b0 = img.at<int>(i,j,0);
                   int g0 = img.at<int>(i,j,1);
