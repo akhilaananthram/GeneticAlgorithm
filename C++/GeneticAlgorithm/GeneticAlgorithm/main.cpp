@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Polygon.h"
 #include "Threshold.h"
-#include "rapidjson\document.h"
-#include "rapidjson\filereadstream.h"
-#include "rapidjson\stringbuffer.h"
-#include "rapidjson\writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #define NUM_POLYGON_PROPERTIES 6
 #define NUM_POPULATION_PROPERTIES 3

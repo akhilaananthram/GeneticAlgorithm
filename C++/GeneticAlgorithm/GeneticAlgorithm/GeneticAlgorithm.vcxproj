@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Fitness.h" />
+    <ClInclude Include="HillStepper.h" />
     <ClInclude Include="LocalSearch.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Threshold.h" />
