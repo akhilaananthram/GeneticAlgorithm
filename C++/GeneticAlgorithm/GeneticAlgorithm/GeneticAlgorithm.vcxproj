@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fitness.cpp" />
+    <ClCompile Include="HillStepper.cpp" />
     <ClCompile Include="LocalSearch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Polygon.cpp" />

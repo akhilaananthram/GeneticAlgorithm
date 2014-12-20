@@ -8,13 +8,13 @@ using namespace std;
 class LocalSearch {
 public:
   LocalSearch(Mat original, Fitness f, int max_iterations);
-  virtual void run() = 0;
+  virtual std::vector<Polygon>* run() = 0;
+  std::vector<Polygon>* randomPerson();
+  float fitness(vector<Polygon>* plys);
+  int max_iterations;
 
 private:
   Mat draw(vector<Polygon>* plys);
-  float fitness(vector<Polygon>* plys);
-  std::vector<Polygon>* randomPerson();
   Mat original;
   Fitness fit;
-  int max_iterations;
 };
