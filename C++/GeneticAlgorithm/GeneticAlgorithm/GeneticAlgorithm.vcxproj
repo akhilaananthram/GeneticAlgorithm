@@ -84,7 +84,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OPENCV_DIR)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCV_DIR)\include; $(SolutionDir)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions); _CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -124,6 +125,7 @@
     <ClInclude Include="Fitness.h" />
     <ClInclude Include="LocalSearch.h" />
     <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Threshold.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fitness.cpp" />

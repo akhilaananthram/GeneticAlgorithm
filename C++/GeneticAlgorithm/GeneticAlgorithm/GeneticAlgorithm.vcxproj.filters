@@ -24,6 +24,9 @@
     <ClInclude Include="LocalSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Threshold.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Polygon.cpp">

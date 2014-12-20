@@ -1,9 +1,11 @@
-#include "Polygon.h"
 #include <algorithm>
 #include <math.h>
+#include "Polygon.h"
+#include "Threshold.h"
 
 extern int WIDTH;
 extern int HEIGHT;
+extern struct Threshold t;
 /*
 #define WIDTH 100
 #define HEIGHT 100
@@ -90,4 +92,27 @@ void Polygon::add_vertex() {
 		points.insert(points.begin() + imax + 1, p);
 	}
 
+}
+
+void Polygon::mutate() {
+	float mutation = ((float)rand()) / RAND_MAX;
+	if (mutation < t.polygon_properties.red) {
+		change_red();
+	} else if (mutation < t.polygon_properties.blue) {
+		change_blue();
+	} else if (mutation < t.polygon_properties.green) {
+		change_green();
+	} else if (mutation < t.polygon_properties.opacity) {
+		change_opacity();
+	} else if (mutation < t.polygon_properties.points) {
+		if (points.size() > 3) {
+			if (((float)rand()) / RAND_MAX < t.polygon_properties.remove) {
+				remove_vertex();
+			} else {
+				add_vertex();
+			}
+		} else {
+			add_vertex();
+		}
+	}
 }
