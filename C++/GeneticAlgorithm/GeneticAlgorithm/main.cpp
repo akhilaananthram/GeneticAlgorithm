@@ -34,34 +34,34 @@ void parse_threshold(const char* threshold_file) {
 		poly_props[i] += poly_props[i - 1];
 	}
 	t.polygon_properties = {
-		poly_props[0], 
-		poly_props[1], 
-		poly_props[2],
-		poly_props[3],
-		poly_props[4],
-		poly_props[5]
+		(float)poly_props[0],
+		(float)poly_props[1],
+		(float)poly_props[2],
+		(float)poly_props[3],
+		(float)poly_props[4],
+		(float)poly_props[5]
 	};
 	Value& pop = d["population"];
 	t.population_properties = {
-		pop["mutate"].GetDouble(),
-		pop["modify"].GetDouble(),
-		pop["remove"].GetDouble()
+		(float)pop["mutate"].GetDouble(),
+		(float)pop["modify"].GetDouble(),
+		(float)pop["remove"].GetDouble()
 	};
 	Value& ev = d["evolve"];
 	t.evolve_properties = {
-		ev["niche"].GetDouble(),
-		ev["mutate"].GetDouble(),
-		ev["elitism"].GetDouble(),
-		ev["random"].GetDouble()
+		(float)ev["niche"].GetDouble(),
+		(float)ev["mutate"].GetDouble(),
+		(float)ev["elitism"].GetDouble(),
+		(float)ev["random"].GetDouble()
 	};
 	fclose(tFile);
 }
 
 int main(int argc, const char * argv[]) {
 	
-	parse_threshold("defaults.json");
+	//parse_threshold("defaults.json");
 	Polygon p = Polygon();
     std::cout << "Hello, World!\n";
-	system("PAUSE");
+	//system("PAUSE");
     return 0;
 }
