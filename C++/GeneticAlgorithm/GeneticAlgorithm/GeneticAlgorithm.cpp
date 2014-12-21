@@ -78,7 +78,7 @@ vector<Polygon>* GeneticAlgorithm::create_child(vector<Person *>* population, fl
 
 vector<Person *>* GeneticAlgorithm::evolve(vector<Person *>* population) {
     //niche penalty
-    float pop_fitness[population_size];
+    float* pop_fitness = new float[population_size];
     if (niche_penalty !=0) {
         for (int i=0; i<population_size; i++) {
             for (int j=0; j<population_size; j++) {
@@ -100,7 +100,7 @@ vector<Person *>* GeneticAlgorithm::evolve(vector<Person *>* population) {
         total += pop_fitness[i];
     }
     
-    float pop_thresholds[population_size];
+    float* pop_thresholds = new float[population_size];
     for (int i=0; i<population_size; i++) {
         pop_thresholds[i] = (1.0 - pop_fitness[i] / total);
         if (i > 0) {
@@ -146,7 +146,8 @@ vector<Person *>* GeneticAlgorithm::evolve(vector<Person *>* population) {
         p.fit = fitness(plys);
         children->at(index) = &p;
     }
-    
+	delete pop_fitness;
+	delete pop_thresholds;
     return children;
 }
 
@@ -161,8 +162,8 @@ std::vector<Polygon>* GeneticAlgorithm::run() {
     }
     
     int iters = 1;
+	float* pop_fitness = new float[population_size];
     while (true) {
-        float pop_fitness[population_size];
         for (int i=0; i<population_size; i++) {
             pop_fitness[i] = population->at(i)->fit;
         }
@@ -188,4 +189,5 @@ std::vector<Polygon>* GeneticAlgorithm::run() {
         
         iters++;
     }
+	delete pop_fitness;
 }
