@@ -63,7 +63,7 @@ void parse_threshold(const char* threshold_file) {
 int main(int argc, const char * argv[]) {
 	
 	//parse_threshold("defaults.json");
-    Mat original = imread("../../images/mona2.jpg", CV_LOAD_IMAGE_COLOR);
+    Mat original = imread("../../../images/mona2.jpg", CV_LOAD_IMAGE_COLOR);
     WIDTH = original.rows;
     HEIGHT = original.cols;
     

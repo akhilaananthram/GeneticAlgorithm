@@ -11,10 +11,10 @@
 		E91B056B1A44C6B000606635 /* Fitness.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B05691A44C6B000606635 /* Fitness.cpp */; };
 		E91B056E1A44C6BA00606635 /* LocalSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B056C1A44C6BA00606635 /* LocalSearch.cpp */; };
 		E91B05741A44C6CE00606635 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E91B05711A44C6CE00606635 /* Polygon.cpp */; };
-		E91B057D1A44E0D200606635 /* libopencv_core.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */; };
-		E91B057F1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */; };
 		E952D0801A45300400B13515 /* GeneticAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E952D07E1A45300400B13515 /* GeneticAlgorithm.cpp */; };
 		E952D0831A45300C00B13515 /* HillStepper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E952D0811A45300C00B13515 /* HillStepper.cpp */; };
+		E96158A01A49EE1C003018EB /* libopencv_core.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E961589F1A49EE1C003018EB /* libopencv_core.2.4.9.dylib */; };
+		E96158A21A49EE41003018EB /* libopencv_highgui.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E96158A11A49EE41003018EB /* libopencv_highgui.2.4.9.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,13 +38,13 @@
 		E91B056D1A44C6BA00606635 /* LocalSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalSearch.h; sourceTree = "<group>"; };
 		E91B05711A44C6CE00606635 /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
 		E91B05721A44C6CE00606635 /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
-		E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.9.dylib; path = ../../../../../../../../../anaconda/lib/libopencv_core.2.4.9.dylib; sourceTree = "<group>"; };
-		E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.9.dylib; path = ../../../../../../../../../anaconda/lib/libopencv_highgui.2.4.9.dylib; sourceTree = "<group>"; };
 		E952D07E1A45300400B13515 /* GeneticAlgorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeneticAlgorithm.cpp; sourceTree = "<group>"; };
 		E952D07F1A45300400B13515 /* GeneticAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeneticAlgorithm.h; sourceTree = "<group>"; };
 		E952D0811A45300C00B13515 /* HillStepper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HillStepper.cpp; sourceTree = "<group>"; };
 		E952D0821A45300C00B13515 /* HillStepper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HillStepper.h; sourceTree = "<group>"; };
 		E952D0841A45302300B13515 /* Threshold.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Threshold.h; sourceTree = "<group>"; };
+		E961589F1A49EE1C003018EB /* libopencv_core.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.9.dylib; path = ../../../../../../../usr/local/Cellar/opencv/2.4.9/lib/libopencv_core.2.4.9.dylib; sourceTree = "<group>"; };
+		E96158A11A49EE41003018EB /* libopencv_highgui.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.9.dylib; path = /usr/local/Cellar/opencv/2.4.9/lib/libopencv_highgui.2.4.9.dylib; sourceTree = "<absolute>"; };
 		E99825051A460465008B7969 /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -53,8 +53,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E91B057F1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib in Frameworks */,
-				E91B057D1A44E0D200606635 /* libopencv_core.2.4.9.dylib in Frameworks */,
+				E96158A21A49EE41003018EB /* libopencv_highgui.2.4.9.dylib in Frameworks */,
+				E96158A01A49EE1C003018EB /* libopencv_core.2.4.9.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,8 +101,8 @@
 		E91B057B1A44E0AC00606635 /* OpenCV Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E91B057E1A44E0E900606635 /* libopencv_highgui.2.4.9.dylib */,
-				E91B057C1A44E0D200606635 /* libopencv_core.2.4.9.dylib */,
+				E96158A11A49EE41003018EB /* libopencv_highgui.2.4.9.dylib */,
+				E961589F1A49EE1C003018EB /* libopencv_core.2.4.9.dylib */,
 			);
 			name = "OpenCV Frameworks";
 			sourceTree = "<group>";
@@ -252,15 +252,16 @@
 		E91B05671A44C55200606635 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					/anaconda/include,
+					/usr/local/Cellar/opencv/2.4.9/include,
 					./include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/anaconda/lib,
+					/usr/local/Cellar/opencv/2.4.9/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -269,15 +270,16 @@
 		E91B05681A44C55200606635 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					/anaconda/include,
+					/usr/local/Cellar/opencv/2.4.9/include,
 					./include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/anaconda/lib,
+					/usr/local/Cellar/opencv/2.4.9/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
